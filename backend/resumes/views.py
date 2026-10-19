@@ -1,15 +1,8 @@
 
 from rest_framework import generics
 from .models import Resume
-from .serializers import ResumeSerializer
-from rest_framework import generics
-from .models import Resume
-from .serializers import ResumeSerializer
-
-
-
 from rest_framework.permissions import AllowAny
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer, ResumeSerializer
 
 
 class RegistrationAPIView(generics.CreateAPIView):

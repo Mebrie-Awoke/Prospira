@@ -7,8 +7,7 @@ from .views import (
 )
 
 urlpatterns = [
-        path("register/", RegistrationAPIView.as_view(), name="register"),
-    urlpatterns = [
+    path("register/", RegistrationAPIView.as_view(), name="register"),
     path(
         "resumes/",
         ResumeListCreateAPIView.as_view(),
