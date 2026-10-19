@@ -21,6 +21,8 @@ class AuthenticationAndResumeAPITests(APITestCase):
 				"username": "testuser",
 				"email": "test@example.com",
 				"password": "SecureTest123!",
+				"is_staff": True,
+				"is_superuser": True,
 			},
 			format="json",
 		)
@@ -111,6 +113,21 @@ class AuthenticationAndResumeAPITests(APITestCase):
 	def test_authenticated_user_can_access_resume_api(self):
 		user = User.objects.create_user(username="resumeuser", password="SecureTest123!")
 		self.client.force_authenticate(user=user)
+
+		response = self.client.get(self.resume_list_url)
+
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+	def test_jwt_access_token_authorizes_resume_api(self):
+		User.objects.create_user(username="jwtuser", password="SecureTest123!")
+		token_response = self.client.post(
+			self.token_url,
+			{"username": "jwtuser", "password": "SecureTest123!"},
+			format="json",
+		)
+		self.client.credentials(
+			HTTP_AUTHORIZATION=f"Bearer {token_response.data['access']}"
+		)
 
 		response = self.client.get(self.resume_list_url)
 
