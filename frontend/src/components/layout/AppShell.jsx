@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { FileText, House, Menu, Plus, Settings, UserRound, X, LogOut, ChevronDown, Sparkles } from 'lucide-react'
+import { FileText, House, Menu, Plus, Settings, UserRound, X, LogOut, ChevronDown, Sparkles, ScanSearch } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 
 const navigation = [
   { label: 'Home', to: '/', icon: House, end: true },
   { label: 'My Resumes', to: '/resumes', icon: FileText },
   { label: 'Create Resume', to: '/templates', icon: Plus },
+  { label: 'Resume Analyzer', to: '/analyzer', icon: ScanSearch },
   { label: 'Profile', to: '/profile', icon: UserRound },
   { label: 'Settings', to: '/settings', icon: Settings },
 ]

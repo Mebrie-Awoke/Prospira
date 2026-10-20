@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { LoaderCircle, Pencil } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { resumesApi } from '../api/resumes'
-import { getApiError } from '../components/resumes/ResumeForm'
+import { getApiError } from '../utils/apiErrors'
 import ResumeForm from '../components/resumes/ResumeForm'
 
 export default function EditResume() {

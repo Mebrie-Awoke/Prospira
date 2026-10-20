@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { ArrowRight, Eye, EyeOff, FileText, LoaderCircle, LockKeyhole, Mail, Sparkles, UserRound } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
-import { getApiError } from '../components/resumes/ResumeForm'
+import { getApiError } from '../utils/apiErrors'
 
 export default function AuthPage({ mode }) {
   const isRegistering = mode === 'register'

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeft, LoaderCircle, Save } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { getApiError } from '../../utils/apiErrors'
 
 const fields = [
   { name: 'full_name', label: 'Full name', required: true, placeholder: 'e.g. Amara Bekele' },
@@ -10,16 +11,6 @@ const fields = [
 
 const initialForm = {
   full_name: '', email: '', phone: '', professional_summary: '', education: '', experience: '', skills: '',
-}
-
-export function getApiError(error) {
-  const data = error.response?.data
-  if (!data) return 'Could not reach the API. Check that Django is running and try again.'
-  if (typeof data === 'string') return data
-  return Object.entries(data).map(([field, messages]) => {
-    const message = Array.isArray(messages) ? messages.join(' ') : String(messages)
-    return field === 'non_field_errors' ? message : `${field.replaceAll('_', ' ')}: ${message}`
-  }).join(' ')
 }
 
 export default function ResumeForm({ initialValues, submitLabel, onSubmit }) {

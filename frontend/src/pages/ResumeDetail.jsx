@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowLeft, Download, LoaderCircle, Pencil, Trash2 } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { resumesApi } from '../api/resumes'
-import { getApiError } from '../components/resumes/ResumeForm'
+import { getApiError } from '../utils/apiErrors'
 import ResumePreview from '../components/resumes/ResumePreview'
 import { printResume } from '../utils/printResume'
 

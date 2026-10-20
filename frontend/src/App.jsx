@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import AppShell from './components/layout/AppShell'
 import AuthPage from './pages/AuthPage'
+import Analyzer from './pages/Analyzer'
 import Dashboard from './pages/Dashboard'
 import MyResumes from './pages/MyResumes'
 import PlaceholderPage from './pages/PlaceholderPage'
@@ -23,6 +24,7 @@ function AppRoutes() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/resumes" element={<MyResumes />} />
         <Route path="/templates" element={<Templates />} />
+        <Route path="/analyzer" element={<Analyzer />} />
         <Route path="/resumes/new" element={<ResumeBuilder />} />
         <Route path="/resumes/:id" element={<ResumeDetail />} />
         <Route path="/resumes/:id/edit" element={<ResumeBuilder />} />
