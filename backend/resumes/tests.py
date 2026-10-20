@@ -133,6 +133,30 @@ class AuthenticationAndResumeAPITests(APITestCase):
 
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+	def test_resume_rejects_invalid_email(self):
+		user = User.objects.create_user(username="invalidemail", password="SecureTest123!")
+		self.client.force_authenticate(user=user)
+		response = self.client.post(
+			self.resume_list_url,
+			{"full_name": "Invalid Email", "email": "not-an-email"},
+			format="json",
+		)
+
+		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+		self.assertIn("email", response.data)
+
+	def test_resume_requires_full_name(self):
+		user = User.objects.create_user(username="missingname", password="SecureTest123!")
+		self.client.force_authenticate(user=user)
+		response = self.client.post(
+			self.resume_list_url,
+			{"email": "valid@example.com"},
+			format="json",
+		)
+
+		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+		self.assertIn("full_name", response.data)
+
 	def test_resume_crud_operations_remain_available(self):
 		user = User.objects.create_user(username="cruduser", password="SecureTest123!")
 		self.client.force_authenticate(user=user)

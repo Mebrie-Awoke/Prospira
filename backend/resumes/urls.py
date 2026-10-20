@@ -4,6 +4,7 @@ from .views import (
     RegistrationAPIView,
     ResumeListCreateAPIView,
     ResumeDetailAPIView,
+    ResumePhotoAPIView,
 )
 
 urlpatterns = [
@@ -17,5 +18,10 @@ urlpatterns = [
         "resumes/<int:pk>/",
         ResumeDetailAPIView.as_view(),
         name="resume-detail",
+    ),
+    path(
+        "resumes/<int:pk>/photo/",
+        ResumePhotoAPIView.as_view(),
+        name="resume-photo",
     ),
 ]
