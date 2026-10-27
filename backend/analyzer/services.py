@@ -2,6 +2,7 @@ import json
 import os
 from typing import Any
 
+
 from groq import (
     APIConnectionError,
     APIError,
@@ -9,7 +10,7 @@ from groq import (
     Groq,
     RateLimitError,
 )
-
+   
 
 MODEL_ID = "openai/gpt-oss-120b"
 REQUEST_TIMEOUT_SECONDS = 45.0
