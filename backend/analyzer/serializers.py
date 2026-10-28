@@ -18,3 +18,25 @@ class ResumeAnalysisRequestSerializer(serializers.Serializer):
 
     def validate_job_description(self, value: str) -> str:
         return value.strip()
+
+
+class ResumeAnalysisResponseSerializer(serializers.Serializer):
+    overall_score = serializers.IntegerField(min_value=0, max_value=100)
+    summary = serializers.CharField(max_length=2_000)
+    strengths = serializers.ListField(
+        child=serializers.CharField(max_length=500), max_length=20
+    )
+    improvements = serializers.ListField(
+        child=serializers.CharField(max_length=500), max_length=20
+    )
+    skills_found = serializers.ListField(
+        child=serializers.CharField(max_length=200), max_length=50
+    )
+    missing_job_skills = serializers.ListField(
+        child=serializers.CharField(max_length=200), max_length=50
+    )
+    experience_feedback = serializers.CharField(max_length=2_000)
+    formatting_feedback = serializers.CharField(max_length=2_000)
+    recommendations = serializers.ListField(
+        child=serializers.CharField(max_length=500), max_length=20
+    )

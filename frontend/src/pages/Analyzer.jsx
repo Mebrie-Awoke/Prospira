@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   AlertCircle,
   ArrowRight,
@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   FileText,
   LoaderCircle,
+  RefreshCw,
   Sparkles,
 } from 'lucide-react'
 import { analyzerApi } from '../api/analyzer'
@@ -62,18 +63,34 @@ export default function Analyzer() {
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const requestRef = useRef(null)
+  const isSubmittingRef = useRef(false)
   const resumeTooLong = resumeText.length > MAX_RESUME_LENGTH
   const jobTooLong = jobDescription.length > MAX_JOB_LENGTH
   const hasResume = Boolean(resumeText.trim())
   const canAnalyze = hasResume && !resumeTooLong && !jobTooLong && !isLoading
 
+  useEffect(() => () => {
+    requestRef.current?.abort()
+    requestRef.current = null
+  }, [])
+
+  function cancelAnalysis() {
+    requestRef.current?.abort()
+    requestRef.current = null
+    isSubmittingRef.current = false
+    setIsLoading(false)
+  }
+
   function updateResumeText(value) {
+    cancelAnalysis()
     setResumeText(value)
     setResult(null)
     setError('')
   }
 
   function updateJobDescription(value) {
+    cancelAnalysis()
     setJobDescription(value)
     setResult(null)
     setError('')
@@ -81,8 +98,11 @@ export default function Analyzer() {
 
   async function handleSubmit(event) {
     event.preventDefault()
-    if (!canAnalyze) return
+    if (!canAnalyze || isSubmittingRef.current) return
 
+    const controller = new AbortController()
+    requestRef.current = controller
+    isSubmittingRef.current = true
     setIsLoading(true)
     setError('')
     setResult(null)
@@ -90,12 +110,19 @@ export default function Analyzer() {
       const analysis = await analyzerApi.analyze({
         resume_text: resumeText.trim(),
         job_description: jobDescription.trim(),
+        signal: controller.signal,
       })
-      setResult(analysis)
+      if (requestRef.current === controller) setResult(analysis)
     } catch (requestError) {
-      setError(getAnalyzerError(requestError))
+      if (!controller.signal.aborted && requestError.code !== 'ERR_CANCELED') {
+        setError(getAnalyzerError(requestError))
+      }
     } finally {
-      setIsLoading(false)
+      if (requestRef.current === controller) {
+        requestRef.current = null
+        isSubmittingRef.current = false
+        setIsLoading(false)
+      }
     }
   }
 
@@ -109,7 +136,7 @@ export default function Analyzer() {
 
       <div className="analyzer-privacy-note">
         <AlertCircle size={17} />
-        <span>Your text is sent to the AI provider for analysis and is not saved by Prospira.</span>
+        <span>Your text is sent to Groq for analysis, with email addresses and phone numbers redacted first. Prospira does not save it.</span>
       </div>
 
       <div className="analyzer-layout">
@@ -118,7 +145,7 @@ export default function Analyzer() {
             <span className="analyzer-card-icon"><FileText size={17} /></span>
             <span>
               <strong>Prepare your analysis</strong>
-              <small>Paste resume text; document upload is not supported yet.</small>
+              <small>Paste text from a resume. PDF and DOCX uploads are not supported.</small>
             </span>
           </div>
           <label className="field analyzer-field" htmlFor="analyzer-resume">
@@ -174,11 +201,16 @@ export default function Analyzer() {
             </div>
           )}
           <button className="button button-primary analyzer-submit" type="submit" disabled={!canAnalyze}>
-            {isLoading ? <LoaderCircle className="analyzer-spinner" size={16} /> : <Sparkles size={16} />}
-            {isLoading ? 'Analyzing resume...' : result ? 'Analyze again' : 'Analyze resume'}
+            {isLoading ? <LoaderCircle className="analyzer-spinner" size={16} /> : error ? <RefreshCw size={16} /> : <Sparkles size={16} />}
+            {isLoading ? 'Analyzing resume...' : error ? 'Retry analysis' : result ? 'Analyze again' : 'Analyze resume'}
             {!isLoading && <ArrowRight size={15} />}
           </button>
-          <p className="analyzer-submit-note">Analysis may take a few moments. Your text is not stored by this service.</p>
+          {isLoading && (
+            <button className="analyzer-cancel" type="button" onClick={cancelAnalysis}>
+              Cancel analysis
+            </button>
+          )}
+          <p className="analyzer-submit-note">Up to 20,000 resume characters and 12,000 job-description characters. Text is sent to Groq and not stored by Prospira.</p>
         </form>
 
         <aside className="analyzer-results" aria-label="Analysis results" aria-live="polite">
@@ -194,13 +226,13 @@ export default function Analyzer() {
             <div className="analyzer-empty-state">
               <LoaderCircle className="analyzer-spinner" size={25} />
               <strong>Reviewing your resume</strong>
-              <p>We are comparing the resume content with your requested criteria.</p>
+              <p>Your submitted text is being analyzed. This may take up to a minute.</p>
             </div>
           ) : result ? (
             <>
               <div className="analyzer-score">
                 <Score value={result.overall_score} />
-                <span><strong>Overall score</strong><small>Based on evidence and clarity in the text</small></span>
+                <span><strong>Overall score</strong><small>0-100, based on evidence, relevance, impact, and clarity</small></span>
               </div>
               <section className="analyzer-result-summary">
                 <h2>Summary</h2>

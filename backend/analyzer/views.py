@@ -1,12 +1,17 @@
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from analyzer.serializers import ResumeAnalysisRequestSerializer
+from analyzer.serializers import (
+    ResumeAnalysisRequestSerializer,
+    ResumeAnalysisResponseSerializer,
+)
 from analyzer.services import (
     AnalyzerConfigurationError,
     AnalyzerProviderError,
+    AnalyzerRateLimitError,
     AnalyzerResponseError,
     analyze_resume,
 )
@@ -14,6 +19,8 @@ from analyzer.services import (
 
 class ResumeAnalysisView(APIView):
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "analyzer"
 
     def post(self, request):
         serializer = ResumeAnalysisRequestSerializer(data=request.data)
@@ -27,6 +34,11 @@ class ResumeAnalysisView(APIView):
                 {"detail": str(error)},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
+        except AnalyzerRateLimitError as error:
+            return Response(
+                {"detail": str(error)},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
         except AnalyzerProviderError as error:
             return Response(
                 {"detail": str(error)},
@@ -38,4 +50,12 @@ class ResumeAnalysisView(APIView):
                 status=status.HTTP_502_BAD_GATEWAY,
             )
 
-        return Response(result, status=status.HTTP_200_OK)
+        response_serializer = ResumeAnalysisResponseSerializer(data=result)
+        try:
+            response_serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError:
+            return Response(
+                {"detail": "The analysis provider returned an invalid result."},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+        return Response(response_serializer.data, status=status.HTTP_200_OK)

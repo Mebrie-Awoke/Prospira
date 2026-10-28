@@ -555,6 +555,9 @@ button { color: inherit; }
 .analyzer-error svg { flex: 0 0 auto; }
 .analyzer-submit { width: 100%; min-height: 40px; }
 .analyzer-submit-note { margin: 9px 0 0; color: #818ca0; font-size: 10px; line-height: 1.5; text-align: center; }
+.analyzer-cancel { display: block; margin: 9px auto 0; padding: 4px 8px; border: 0; color: #586780; background: transparent; font-size: 10px; font-weight: 700; cursor: pointer; }
+.analyzer-cancel:hover { color: var(--blue); text-decoration: underline; }
+.analyzer-cancel:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .analyzer-submit:disabled { cursor: not-allowed; opacity: .55; transform: none; }
 .analyzer-score { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e6ebf3; border-radius: 6px; background: #fafbfe; }
 .analyzer-score-ring { position: relative; width: 56px; height: 56px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 50%; background: conic-gradient(var(--blue) var(--score-progress), #dfe6f1 0); }

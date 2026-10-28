@@ -6,13 +6,14 @@ from unittest.mock import patch
 import httpx
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from groq import APITimeoutError
+from groq import APITimeoutError, RateLimitError
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from analyzer.services import (
     AnalyzerConfigurationError,
     AnalyzerProviderError,
+    AnalyzerRateLimitError,
     AnalyzerResponseError,
     RESULT_FIELDS,
     analyze_resume,
@@ -107,6 +108,55 @@ class AnalyzerServiceTests(APITestCase):
         with patch.dict(os.environ, {"GROQ_API_KEY": "unit-test-key"}):
             with self.assertRaises(AnalyzerProviderError):
                 analyze_resume("Private resume text")
+
+    @patch("analyzer.services.Groq")
+    def test_provider_rate_limit_uses_dedicated_error(self, groq_client):
+        request = httpx.Request("POST", "https://api.groq.com/openai/v1/chat/completions")
+        response = httpx.Response(429, request=request, json={"error": {"message": "busy"}})
+        groq_client.return_value.chat.completions.create.side_effect = RateLimitError(
+            "rate limited",
+            response=response,
+            body={"error": {"message": "busy"}},
+        )
+
+        with patch.dict(os.environ, {"GROQ_API_KEY": "unit-test-key"}):
+            with self.assertRaises(AnalyzerRateLimitError):
+                analyze_resume("Resume content")
+
+    @patch("analyzer.services.Groq")
+    def test_redacts_contact_details_without_removing_year_ranges(self, groq_client):
+        groq_client.return_value.chat.completions.create.return_value = (
+            completion_with(json.dumps(valid_analysis()))
+        )
+
+        with patch.dict(os.environ, {"GROQ_API_KEY": "unit-test-key"}):
+            analyze_resume(
+                "jane@example.com\n(555) 123-4567\n2019-2024",
+                "Contact recruiter@example.com at 212-555-0199",
+            )
+
+        prompt = json.loads(
+            groq_client.return_value.chat.completions.create.call_args.kwargs[
+                "messages"
+            ][1]["content"]
+        )
+        self.assertNotIn("jane@example.com", prompt["resume_text"])
+        self.assertNotIn("555", prompt["resume_text"])
+        self.assertIn("2019-2024", prompt["resume_text"])
+        self.assertNotIn("recruiter@example.com", prompt["job_description"])
+        self.assertNotIn("212-555-0199", prompt["job_description"])
+
+    @patch("analyzer.services.Groq")
+    def test_unexpected_provider_error_is_sanitized(self, groq_client):
+        groq_client.return_value.chat.completions.create.side_effect = RuntimeError(
+            "provider error containing a private key"
+        )
+
+        with patch.dict(os.environ, {"GROQ_API_KEY": "unit-test-key"}):
+            with self.assertRaises(AnalyzerProviderError) as error:
+                analyze_resume("Resume content")
+
+        self.assertNotIn("private key", str(error.exception))
 
 
 class AnalyzerEndpointTests(APITestCase):
@@ -207,3 +257,33 @@ class AnalyzerEndpointTests(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
+
+    @patch("analyzer.views.analyze_resume")
+    def test_provider_rate_limit_returns_too_many_requests(self, analyze_resume_mock):
+        self.client.force_authenticate(self.user)
+        analyze_resume_mock.side_effect = AnalyzerRateLimitError(
+            "Resume analysis is temporarily busy. Please try again shortly."
+        )
+        response = self.client.post(
+            self.url,
+            {"resume_text": "Example resume"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+
+    @patch("analyzer.views.analyze_resume")
+    def test_rejects_malformed_analysis_result(self, analyze_resume_mock):
+        self.client.force_authenticate(self.user)
+        analyze_resume_mock.return_value = {"overall_score": 72}
+        response = self.client.post(
+            self.url,
+            {"resume_text": "Example resume"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
+        self.assertEqual(
+            response.data["detail"],
+            "The analysis provider returned an invalid result.",
+        )
