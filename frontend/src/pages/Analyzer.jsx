@@ -8,7 +8,6 @@ import {
   LoaderCircle,
   RefreshCw,
   Sparkles,
-  Upload,
   X,
 } from 'lucide-react'
 import { analyzerApi } from '../api/analyzer'
