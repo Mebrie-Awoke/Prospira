@@ -66,7 +66,7 @@ export default function ResumeDetail() {
       {notice && <div className="success-notice" role="status">{notice}<button onClick={() => setNotice('')} aria-label="Dismiss">×</button></div>}
       {error && <div className="form-error" role="alert">{error}</div>}
       <div className="detail-preview-heading"><span className="eyebrow">RESUME PREVIEW</span><h1>{resume.resume_title || `${resume.full_name} Resume`}</h1></div>
-      <div className="detail-resume-sheet"><ResumePreview resume={{ ...resume, skills_list: resume.skills_list?.length ? resume.skills_list : (resume.skills || '').split(/[ ,\n]/).map((skill) => skill.trim()).filter(Boolean) }} template={resume.template_identifier} /></div>
+      <div className="detail-resume-sheet"><ResumePreview resume={{ ...resume, skills_list: resume.skills_list?.length ? resume.skills_list : (resume.skills || '').split(/[,\r\n]/).map((skill) => skill.trim()).filter(Boolean) }} template={resume.template_identifier} /></div>
 
       {confirmDelete && (
         <div className="dialog-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget && !deleting) setConfirmDelete(false) }}>
