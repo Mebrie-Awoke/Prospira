@@ -1,11 +1,14 @@
 import json
 import os
+from io import BytesIO
 from types import SimpleNamespace
 from unittest.mock import patch
 
 import httpx
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from docx import Document
 from groq import APITimeoutError, RateLimitError
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -17,6 +20,8 @@ from analyzer.services import (
     AnalyzerResponseError,
     RESULT_FIELDS,
     analyze_resume,
+    extract_resume_text,
+    ResumeExtractionError,
 )
 
 
@@ -287,3 +292,100 @@ class AnalyzerEndpointTests(APITestCase):
             response.data["detail"],
             "The analysis provider returned an invalid result.",
         )
+
+
+
+class ResumeDocumentExtractionTests(APITestCase):
+    def make_docx(self):
+        buffer = BytesIO()
+        document = Document()
+        document.add_heading("Candidate Resume", level=1)
+        document.add_paragraph("Python developer with Django experience.")
+        table = document.add_table(rows=1, cols=2)
+        table.rows[0].cells[0].text = "Education"
+        table.rows[0].cells[1].text = "Computer Science"
+        document.save(buffer)
+        return buffer.getvalue()
+
+    def test_extracts_text_from_docx_paragraphs_and_tables(self):
+        uploaded = SimpleUploadedFile(
+            "candidate.docx",
+            self.make_docx(),
+            content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+
+        extracted = extract_resume_text(uploaded)
+
+        self.assertIn("Python developer with Django experience.", extracted)
+        self.assertIn("Education | Computer Science", extracted)
+
+    def test_rejects_invalid_pdf_signature(self):
+        uploaded = SimpleUploadedFile(
+            "candidate.pdf",
+            b"not a PDF document",
+            content_type="application/pdf",
+        )
+
+        with self.assertRaises(ResumeExtractionError):
+            extract_resume_text(uploaded)
+
+    def test_rejects_empty_or_image_only_docx(self):
+        buffer = BytesIO()
+        Document().save(buffer)
+        uploaded = SimpleUploadedFile("empty.docx", buffer.getvalue())
+
+        with self.assertRaises(ResumeExtractionError):
+            extract_resume_text(uploaded)
+
+    @patch("analyzer.views.analyze_resume")
+    def test_analyzer_accepts_docx_upload(self, analyze_resume_mock):
+        user = get_user_model().objects.create_user(
+            username="docx-user",
+            password="test-password",
+        )
+        self.client.force_authenticate(user)
+        expected = valid_analysis()
+        analyze_resume_mock.return_value = expected
+        uploaded = SimpleUploadedFile(
+            "candidate.docx",
+            self.make_docx(),
+            content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+
+        response = self.client.post(
+            reverse("analyze-resume"),
+            {"resume_file": uploaded, "job_description": "Python developer"},
+            format="multipart",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, expected)
+        self.assertIn(
+            "Python developer with Django experience.",
+            analyze_resume_mock.call_args.kwargs["resume_text"],
+        )
+        self.assertEqual(
+            analyze_resume_mock.call_args.kwargs["job_description"],
+            "Python developer",
+        )
+
+    def test_analyzer_rejects_unsupported_file_type(self):
+        user = get_user_model().objects.create_user(
+            username="unsupported-file-user",
+            password="test-password",
+        )
+        self.client.force_authenticate(user)
+        uploaded = SimpleUploadedFile(
+            "resume.txt",
+            b"Plain text file",
+            content_type="text/plain",
+        )
+
+        response = self.client.post(
+            reverse("analyze-resume"),
+            {"resume_file": uploaded},
+            format="multipart",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("resume_file", response.data)
