@@ -100,7 +100,7 @@ CORS_ALLOWED_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
-CORS_ALLOWED_ORIGIN_REGEXES = [r'^https://.*\.ethiodeploy\.app]
+CORS_ALLOWED_ORIGIN_REGEXES = []
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
