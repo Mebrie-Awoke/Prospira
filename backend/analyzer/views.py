@@ -13,7 +13,9 @@ from analyzer.services import (
     AnalyzerProviderError,
     AnalyzerRateLimitError,
     AnalyzerResponseError,
+    ResumeExtractionError,
     analyze_resume,
+    extract_resume_text,
 )
 
 
@@ -24,11 +26,24 @@ class ResumeAnalysisView(APIView):
 
     def post(self, request):
         serializer = ResumeAnalysisRequestSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        values = serializer.validated_data
 
         try:
-            result = analyze_resume(**serializer.validated_data)
+            resume_text = (
+                extract_resume_text(values["resume_file"])
+                if values.get("resume_file")
+                else values["resume_text"]
+            )
+            result = analyze_resume(
+                resume_text=resume_text,
+                job_description=values["job_description"],
+            )
+        except ResumeExtractionError as error:
+            return Response(
+                {"detail": str(error)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except AnalyzerConfigurationError as error:
             return Response(
                 {"detail": str(error)},
