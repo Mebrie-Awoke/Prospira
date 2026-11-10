@@ -8,12 +8,16 @@ import {
   LoaderCircle,
   RefreshCw,
   Sparkles,
+  Upload,
+  X,
 } from 'lucide-react'
 import { analyzerApi } from '../api/analyzer'
 import { getApiError } from '../utils/apiErrors'
 
 const MAX_RESUME_LENGTH = 20000
 const MAX_JOB_LENGTH = 12000
+const MAX_FILE_SIZE = 5 * 1024 * 1024
+const ACCEPTED_EXTENSIONS = ['pdf', 'docx']
 
 const resultSections = [
   ['Strengths', 'strengths'],
@@ -54,20 +58,30 @@ function ResultList({ title, items }) {
 function getAnalyzerError(error) {
   const data = error.response?.data
   if (data?.detail) return data.detail
+  if (data?.resume_file) return data.resume_file.join(' ')
+  if (data?.non_field_errors) return data.non_field_errors.join(' ')
   return getApiError(error)
+}
+
+function formatFileSize(bytes) {
+  return bytes < 1024 * 1024
+    ? `${(bytes / 1024).toFixed(0)} KB`
+    : `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 export default function Analyzer() {
   const [resumeText, setResumeText] = useState('')
+  const [resumeFile, setResumeFile] = useState(null)
   const [jobDescription, setJobDescription] = useState('')
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [fileInputKey, setFileInputKey] = useState(0)
   const requestRef = useRef(null)
   const isSubmittingRef = useRef(false)
   const resumeTooLong = resumeText.length > MAX_RESUME_LENGTH
   const jobTooLong = jobDescription.length > MAX_JOB_LENGTH
-  const hasResume = Boolean(resumeText.trim())
+  const hasResume = Boolean(resumeText.trim() || resumeFile)
   const canAnalyze = hasResume && !resumeTooLong && !jobTooLong && !isLoading
 
   useEffect(() => () => {
@@ -82,18 +96,56 @@ export default function Analyzer() {
     setIsLoading(false)
   }
 
+  function clearResult() {
+    setResult(null)
+    setError('')
+  }
+
   function updateResumeText(value) {
     cancelAnalysis()
     setResumeText(value)
-    setResult(null)
-    setError('')
+    if (value.trim()) {
+      setResumeFile(null)
+      setFileInputKey((key) => key + 1)
+    }
+    clearResult()
   }
 
   function updateJobDescription(value) {
     cancelAnalysis()
     setJobDescription(value)
-    setResult(null)
-    setError('')
+    clearResult()
+  }
+
+  function selectResumeFile(event) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const extension = file.name.split('.').pop()?.toLowerCase()
+    if (!ACCEPTED_EXTENSIONS.includes(extension)) {
+      setError('Choose a PDF or DOCX resume file.')
+      event.target.value = ''
+      return
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setError('The resume file must be 5 MB or smaller.')
+      event.target.value = ''
+      return
+    }
+    if (file.size === 0) {
+      setError('The selected file is empty. Choose another file.')
+      event.target.value = ''
+      return
+    }
+    cancelAnalysis()
+    setResumeFile(file)
+    setResumeText('')
+    clearResult()
+  }
+
+  function removeResumeFile() {
+    setResumeFile(null)
+    setFileInputKey((key) => key + 1)
+    clearResult()
   }
 
   async function handleSubmit(event) {
@@ -109,6 +161,7 @@ export default function Analyzer() {
     try {
       const analysis = await analyzerApi.analyze({
         resume_text: resumeText.trim(),
+        resume_file: resumeFile,
         job_description: jobDescription.trim(),
         signal: controller.signal,
       })
@@ -136,7 +189,7 @@ export default function Analyzer() {
 
       <div className="analyzer-privacy-note">
         <AlertCircle size={17} />
-        <span>Your text is sent to Groq for analysis, with email addresses and phone numbers redacted first. Prospira does not save it.</span>
+        <span>Your resume is processed temporarily for analysis. Contact details are redacted before text is sent to Groq. Prospira does not save the uploaded document or extracted text.</span>
       </div>
 
       <div className="analyzer-layout">
@@ -145,11 +198,34 @@ export default function Analyzer() {
             <span className="analyzer-card-icon"><FileText size={17} /></span>
             <span>
               <strong>Prepare your analysis</strong>
-              <small>Paste text from a resume. PDF and DOCX uploads are not supported.</small>
+              <small>Upload a PDF/DOCX file or paste resume text.</small>
             </span>
           </div>
+
+          <div className="analyzer-upload">
+            <label className="field" htmlFor="analyzer-resume-file">
+              <span>Upload resume <small>(PDF or DOCX, max 5 MB)</small></span>
+              <input
+                key={fileInputKey}
+                id="analyzer-resume-file"
+                type="file"
+                accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={selectResumeFile}
+                disabled={isLoading}
+              />
+            </label>
+            {resumeFile && (
+              <div className="analyzer-selected-file">
+                <FileText size={17} />
+                <span><strong>{resumeFile.name}</strong><small>{formatFileSize(resumeFile.size)}</small></span>
+                <button type="button" onClick={removeResumeFile} aria-label="Remove selected resume" disabled={isLoading}><X size={16} /></button>
+              </div>
+            )}
+            <div className="analyzer-input-divider"><span>OR PASTE RESUME TEXT</span></div>
+          </div>
+
           <label className="field analyzer-field" htmlFor="analyzer-resume">
-            <span>Resume text <em>Required</em></span>
+            <span>Resume text <em>Required if no file is uploaded</em></span>
             <textarea
               id="analyzer-resume"
               value={resumeText}
@@ -158,7 +234,8 @@ export default function Analyzer() {
               rows={12}
               placeholder="Paste the text from your resume here..."
               aria-describedby="resume-text-help"
-              required
+              disabled={Boolean(resumeFile) || isLoading}
+              required={!resumeFile}
             />
             <small
               id="resume-text-help"
@@ -178,6 +255,7 @@ export default function Analyzer() {
               rows={7}
               placeholder="Paste a job description for role-specific feedback..."
               aria-describedby="job-description-help"
+              disabled={isLoading}
             />
             <small
               id="job-description-help"
@@ -190,7 +268,7 @@ export default function Analyzer() {
           {(!hasResume || resumeTooLong || jobTooLong) && (
             <p className="analyzer-validation" role="status">
               {!hasResume
-                ? 'Add your resume text to start the analysis.'
+                ? 'Upload a resume or paste its text to start the analysis.'
                 : 'Reduce the text to the displayed character limits before analysis.'}
             </p>
           )}
@@ -210,7 +288,7 @@ export default function Analyzer() {
               Cancel analysis
             </button>
           )}
-          <p className="analyzer-submit-note">Up to 20,000 resume characters and 12,000 job-description characters. Text is sent to Groq and not stored by Prospira.</p>
+          <p className="analyzer-submit-note">Files are limited to 5 MB and 10 PDF pages. Scanned/image-only PDFs are not supported yet. Text is sent to Groq for analysis and is not stored by Prospira.</p>
         </form>
 
         <aside className="analyzer-results" aria-label="Analysis results" aria-live="polite">
@@ -226,7 +304,7 @@ export default function Analyzer() {
             <div className="analyzer-empty-state">
               <LoaderCircle className="analyzer-spinner" size={25} />
               <strong>Reviewing your resume</strong>
-              <p>Your submitted text is being analyzed. This may take up to a minute.</p>
+              <p>Your submitted resume is being extracted and analyzed. This may take up to a minute.</p>
             </div>
           ) : result ? (
             <>
@@ -261,7 +339,7 @@ export default function Analyzer() {
             <div className="analyzer-empty-state">
               <CheckCircle2 size={25} />
               <strong>Your feedback will appear here</strong>
-              <p>Submit your resume text to receive an evidence-based review. Add a job description for a targeted comparison.</p>
+              <p>Upload your resume or paste its text to receive an evidence-based review. Add a job description for a targeted comparison.</p>
             </div>
           )}
         </aside>
