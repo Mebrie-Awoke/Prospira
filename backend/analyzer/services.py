@@ -3,7 +3,7 @@ import os
 import re
 from typing import Any
 
-
+from docx import Document
 from groq import (
     APIConnectionError,
     APIError,
@@ -11,10 +11,13 @@ from groq import (
     Groq,
     RateLimitError,
 )
-   
+from pypdf import PdfReader
+
 
 MODEL_ID = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 REQUEST_TIMEOUT_SECONDS = 45.0
+MAX_EXTRACTED_RESUME_LENGTH = 20_000
+MAX_PDF_PAGES = 10
 
 RESULT_FIELDS = (
     "overall_score",
@@ -81,6 +84,58 @@ class AnalyzerRateLimitError(AnalyzerProviderError):
 
 class AnalyzerResponseError(AnalyzerError):
     """The provider returned an unusable analysis."""
+
+
+class ResumeExtractionError(AnalyzerError):
+    """The uploaded document could not be safely converted to text."""
+
+
+def extract_resume_text(uploaded_file: Any) -> str:
+    """Extract text from a supported PDF or DOCX upload without storing it."""
+    filename = getattr(uploaded_file, "name", "")
+    extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    try:
+        uploaded_file.seek(0)
+        signature = uploaded_file.read(8)
+        uploaded_file.seek(0)
+
+        if extension == "pdf":
+            if not signature.startswith(b"%PDF-"):
+                raise ResumeExtractionError("The uploaded file is not a valid PDF.")
+            reader = PdfReader(uploaded_file, strict=True)
+            if reader.is_encrypted:
+                raise ResumeExtractionError("Password-protected PDFs are not supported.")
+            if len(reader.pages) > MAX_PDF_PAGES:
+                raise ResumeExtractionError("PDF resumes must contain 10 pages or fewer.")
+            text = "\n".join(page.extract_text() or "" for page in reader.pages)
+        elif extension == "docx":
+            if not signature.startswith(b"PK"):
+                raise ResumeExtractionError("The uploaded file is not a valid DOCX document.")
+            document = Document(uploaded_file)
+            parts = [paragraph.text for paragraph in document.paragraphs]
+            for table in document.tables:
+                for row in table.rows:
+                    parts.append(" | ".join(cell.text for cell in row.cells))
+            text = "\n".join(parts)
+        else:
+            raise ResumeExtractionError("Upload a PDF or DOCX file.")
+    except ResumeExtractionError:
+        raise
+    except Exception as error:
+        raise ResumeExtractionError(
+            "We could not read this document. Check that it is a valid, unprotected PDF or DOCX file."
+        ) from error
+
+    text = text.strip()
+    if not text:
+        raise ResumeExtractionError(
+            "No readable text was found. Scanned or image-only resumes are not supported yet."
+        )
+    if len(text) > MAX_EXTRACTED_RESUME_LENGTH:
+        raise ResumeExtractionError(
+            "The extracted resume is too long. Keep it within 20,000 characters."
+        )
+    return text
 
 
 def _validate_result(value: Any) -> dict[str, Any]:
