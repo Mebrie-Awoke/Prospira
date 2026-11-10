@@ -1,10 +1,9 @@
 import axios from 'axios'
 
-const defaultApiUrl = import.meta.env.DEV
+// Production API hosted on Render.
+const apiBaseUrl = import.meta.env.DEV
   ? 'http://127.0.0.1:8000/api'
   : 'https://prospira-dis6.onrender.com/api'
-
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || defaultApiUrl).replace(/\/+$/, '')
 
 export const api = axios.create({
   baseURL: apiBaseUrl,
