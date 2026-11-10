@@ -33,7 +33,11 @@ class ResumeAnalysisRequestSerializer(serializers.Serializer):
     def validate(self, attrs):
         resume_text = attrs.get("resume_text", "").strip()
         resume_file = attrs.get("resume_file")
-        if bool(resume_text) == bool(resume_file):
+        if not resume_text and not resume_file:
+            raise serializers.ValidationError(
+                {"resume_text": "Provide resume text or upload a PDF/DOCX file."}
+            )
+        if resume_text and resume_file:
             raise serializers.ValidationError(
                 "Provide either resume text or one PDF/DOCX file, not both."
             )
