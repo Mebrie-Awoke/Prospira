@@ -768,3 +768,63 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+
+/* Resume analyzer document upload */
+.analyzer-upload { margin-bottom: 14px; }
+.analyzer-upload input[type="file"] {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px;
+  border: 1px dashed #cbd5e5;
+  border-radius: 9px;
+  color: var(--ink-soft);
+  background: #f8faff;
+  font: inherit;
+  font-size: 11px;
+}
+.analyzer-upload input[type="file"]:hover { border-color: var(--blue); background: #f3f7ff; }
+.analyzer-selected-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--blue);
+  background: #f8faff;
+}
+.analyzer-selected-file > span { display: grid; flex: 1; min-width: 0; gap: 3px; }
+.analyzer-selected-file strong { overflow: hidden; color: var(--ink); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.analyzer-selected-file small { color: var(--muted); font-size: 10px; }
+.analyzer-selected-file button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  color: #78859a;
+  background: transparent;
+  cursor: pointer;
+}
+.analyzer-selected-file button:hover { color: var(--coral); background: var(--coral-pale); }
+.analyzer-input-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 0;
+  color: #929db0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .09em;
+}
+.analyzer-input-divider::before, .analyzer-input-divider::after {
+  height: 1px;
+  flex: 1;
+  background: var(--line);
+  content: "";
+}
