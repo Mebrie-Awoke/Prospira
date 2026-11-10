@@ -16,6 +16,8 @@ Including another URLconf
 """
 
 from django.conf import settings
+from django.db import connection
+from django.http import JsonResponse
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import render
@@ -25,11 +27,21 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 @require_GET
+def health_check(request):
+    try:
+        connection.ensure_connection()
+    except Exception:
+        return JsonResponse({"status": "unavailable"}, status=503)
+    return JsonResponse({"status": "ok"})
+
+
+@require_GET
 def frontend_index(request, **kwargs):
     return render(request, "index.html")
 
 
 urlpatterns = [
+    path("api/health/", health_check, name="health-check"),
     path("admin/", admin.site.urls),
     path("api/", include("resumes.urls")),
     path("api/analyzer/", include("analyzer.urls")),
