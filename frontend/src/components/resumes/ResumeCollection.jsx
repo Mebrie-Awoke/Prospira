@@ -1,7 +1,8 @@
 import { useDeferredValue, useEffect, useState } from 'react'
-import { AlertCircle, FilePlus2, LoaderCircle, Search } from 'lucide-react'
+import { AlertCircle, AlertTriangle, FilePlus2, LoaderCircle, Search, Trash2, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { resumesApi } from '../../api/resumes'
+import { getApiError } from '../../utils/apiErrors'
 import ResumeCard from './ResumeCard'
 
 export default function ResumeCollection({ dashboard = false }) {
@@ -9,6 +10,8 @@ export default function ResumeCollection({ dashboard = false }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
+  const [pendingDelete, setPendingDelete] = useState(null)
+  const [deleting, setDeleting] = useState(false)
   const deferredQuery = useDeferredValue(query)
 
   async function loadResumes() {
@@ -18,23 +21,27 @@ export default function ResumeCollection({ dashboard = false }) {
       const data = await resumesApi.list()
       setResumes(Array.isArray(data) ? data : data.results || [])
     } catch (requestError) {
-      setError(requestError.response?.status === 401 ? 'Your session expired. Sign in again to continue.' : 'We could not load resumes. Check that Django is running and try again.')
+      setError(getApiError(requestError))
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    loadResumes()
-  }, [])
+  useEffect(() => { loadResumes() }, [])
 
-  async function removeResume(resume) {
-    if (!window.confirm(`Delete the resume for ${resume.full_name}? This cannot be undone.`)) return
+  async function removeResume() {
+    if (!pendingDelete || deleting) return
+    setDeleting(true)
+    setError('')
     try {
-      await resumesApi.remove(resume.id)
-      setResumes((current) => current.filter((item) => item.id !== resume.id))
+      await resumesApi.remove(pendingDelete.id)
+      setResumes((current) => current.filter((item) => item.id !== pendingDelete.id))
+      setPendingDelete(null)
     } catch (requestError) {
-      setError(requestError.response?.status === 401 ? 'Your session expired. Sign in again to continue.' : 'We could not delete this resume. Try again.')
+      setError(getApiError(requestError))
+      setPendingDelete(null)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -55,15 +62,30 @@ export default function ResumeCollection({ dashboard = false }) {
       </div>
 
       {loading ? <div className="state-panel"><LoaderCircle className="spin" size={22} /><span>Loading resumes…</span></div> : error ? (
-        <div className="state-panel state-error"><AlertCircle size={21} /><div><strong>Couldn’t load your resumes</strong><span>{error}</span></div><button className="button button-quiet" onClick={loadResumes}>Try again</button></div>
+        <div className="state-panel state-error" role="alert"><AlertCircle size={21} /><div><strong>We couldn't complete that request</strong><span>{error}</span></div><button className="button button-quiet" onClick={loadResumes}>Try again</button></div>
       ) : resumes.length === 0 ? (
         <div className="empty-state"><span className="empty-icon"><FilePlus2 size={23} /></span><h3>Your next resume starts here</h3><p>Choose a professional template and build your first resume.</p><Link to="/templates" className="button button-primary"><FilePlus2 size={16} /> Create a resume</Link></div>
       ) : matchingResumes.length === 0 ? (
         <div className="empty-state compact-empty"><span className="empty-icon"><Search size={22} /></span><h3>No matches found</h3><p>Try a different name, email, or skill.</p></div>
       ) : (
-        <div className="resume-list">{displayedResumes.map((resume) => <ResumeCard key={resume.id} resume={resume} onDelete={removeResume} />)}</div>
+        <div className="resume-list">{displayedResumes.map((resume) => <ResumeCard key={resume.id} resume={resume} onDelete={setPendingDelete} />)}</div>
       )}
       {dashboard && matchingResumes.length > 3 && <Link className="view-all-link" to="/resumes">Browse all {matchingResumes.length} resumes <span>→</span></Link>}
+
+      {pendingDelete && (
+        <div className="dialog-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget && !deleting) setPendingDelete(null) }}>
+          <section className="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="collection-delete-title" aria-describedby="collection-delete-description">
+            <button className="dialog-close" type="button" aria-label="Close dialog" disabled={deleting} onClick={() => setPendingDelete(null)}><X size={18} /></button>
+            <span className="dialog-icon dialog-icon-danger"><AlertTriangle size={22} /></span>
+            <h2 id="collection-delete-title">Delete this resume?</h2>
+            <p id="collection-delete-description">Permanently delete <strong>{pendingDelete.resume_title || pendingDelete.full_name}</strong>? This action cannot be undone.</p>
+            <div className="dialog-actions">
+              <button className="button button-quiet" type="button" disabled={deleting} onClick={() => setPendingDelete(null)}>Cancel</button>
+              <button className="button button-danger" type="button" disabled={deleting} onClick={removeResume}>{deleting ? <LoaderCircle className="spin" size={15} /> : <Trash2 size={15} />}{deleting ? 'Deleting…' : 'Delete permanently'}</button>
+            </div>
+          </section>
+        </div>
+      )}
     </section>
   )
 }
