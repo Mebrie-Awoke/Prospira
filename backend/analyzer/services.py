@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import zipfile
 from typing import Any
 
 from docx import Document
@@ -18,6 +19,8 @@ MODEL_ID = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 REQUEST_TIMEOUT_SECONDS = 45.0
 MAX_EXTRACTED_RESUME_LENGTH = 20_000
 MAX_PDF_PAGES = 10
+MAX_DOCX_UNCOMPRESSED_SIZE = 25 * 1024 * 1024
+MAX_DOCX_ARCHIVE_ENTRIES = 2_000
 
 RESULT_FIELDS = (
     "overall_score",
@@ -111,6 +114,17 @@ def extract_resume_text(uploaded_file: Any) -> str:
         elif extension == "docx":
             if not signature.startswith(b"PK"):
                 raise ResumeExtractionError("The uploaded file is not a valid DOCX document.")
+            with zipfile.ZipFile(uploaded_file) as archive:
+                entries = archive.infolist()
+                uncompressed_size = sum(entry.file_size for entry in entries)
+                required_parts = {"[Content_Types].xml", "word/document.xml"}
+                if (
+                    len(entries) > MAX_DOCX_ARCHIVE_ENTRIES
+                    or uncompressed_size > MAX_DOCX_UNCOMPRESSED_SIZE
+                    or not required_parts.issubset({entry.filename for entry in entries})
+                ):
+                    raise ResumeExtractionError("The DOCX document is invalid or too large to process.")
+            uploaded_file.seek(0)
             document = Document(uploaded_file)
             parts = [paragraph.text for paragraph in document.paragraphs]
             for table in document.tables:
