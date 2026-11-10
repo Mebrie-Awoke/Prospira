@@ -1,11 +1,15 @@
 import { api } from './client'
 
 export const analyzerApi = {
-  async analyze({ resume_text, job_description = '', signal }) {
-    const { data } = await api.post('/analyzer/analyze/', {
-      resume_text,
-      job_description,
-    }, { signal })
+  async analyze({ resume_text = '', resume_file = null, job_description = '', signal }) {
+    let payload = { resume_text, job_description }
+    if (resume_file) {
+      payload = new FormData()
+      payload.append('resume_file', resume_file)
+      payload.append('job_description', job_description)
+    }
+
+    const { data } = await api.post('/analyzer/analyze/', payload, { signal })
     return data
   },
 }
