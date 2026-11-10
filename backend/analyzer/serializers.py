@@ -1,23 +1,45 @@
 from rest_framework import serializers
 
 
+MAX_RESUME_LENGTH = 20_000
+MAX_JOB_LENGTH = 12_000
+MAX_FILE_SIZE = 5 * 1024 * 1024
+
+
 class ResumeAnalysisRequestSerializer(serializers.Serializer):
-    resume_text = serializers.CharField(max_length=20_000, trim_whitespace=False)
+    resume_text = serializers.CharField(
+        max_length=MAX_RESUME_LENGTH,
+        required=False,
+        allow_blank=True,
+        trim_whitespace=False,
+    )
+    resume_file = serializers.FileField(required=False, write_only=True)
     job_description = serializers.CharField(
-        max_length=12_000,
+        max_length=MAX_JOB_LENGTH,
         required=False,
         allow_blank=True,
         default="",
         trim_whitespace=False,
     )
 
-    def validate_resume_text(self, value: str) -> str:
-        if not value.strip():
-            raise serializers.ValidationError("Resume text cannot be empty.")
-        return value.strip()
+    def validate_resume_file(self, value):
+        if value.size > MAX_FILE_SIZE:
+            raise serializers.ValidationError("Resume files must be 5 MB or smaller.")
+        extension = value.name.rsplit(".", 1)[-1].lower() if "." in value.name else ""
+        if extension not in {"pdf", "docx"}:
+            raise serializers.ValidationError("Upload a PDF or DOCX file.")
+        return value
 
-    def validate_job_description(self, value: str) -> str:
-        return value.strip()
+    def validate(self, attrs):
+        resume_text = attrs.get("resume_text", "").strip()
+        resume_file = attrs.get("resume_file")
+        if bool(resume_text) == bool(resume_file):
+            raise serializers.ValidationError(
+                "Provide either resume text or one PDF/DOCX file, not both."
+            )
+        attrs["resume_text"] = resume_text
+        attrs["job_description"] = attrs.get("job_description", "").strip()
+        return attrs
 
 
 class ResumeAnalysisResponseSerializer(serializers.Serializer):
