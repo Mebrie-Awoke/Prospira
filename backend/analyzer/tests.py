@@ -479,7 +479,7 @@ class CoverLetterEndpointTests(APITestCase):
         self.assertEqual(response.data["title"], "Mebrie Awoke — Python Developer")
         saved = CoverLetter.objects.get(pk=response.data["id"])
         self.assertEqual(saved.user, self.user)
-        self.assertNotIn("Python developer", saved.content.replace("Python developer", "", 1))
+        self.assertEqual(saved.content, generate_mock.return_value)
         generate_mock.assert_called_once()
 
     def test_cover_letter_library_is_private_and_owner_can_delete(self):
