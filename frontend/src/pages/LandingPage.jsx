@@ -24,15 +24,15 @@ function ResumeMockup() {
       <div className="landing-preview-glow" />
       <div className="landing-resume-paper">
         <div className="mock-resume-header">
-          <div><span className="mock-name">Alex Morgan</span><span className="mock-role">PRODUCT DESIGNER</span></div>
-          <span className="mock-monogram">AM</span>
+          <div><span className="mock-name">Mebrie Awoke</span><span className="mock-role">SOFTWARE DEVELOPER</span></div>
+          <span className="mock-monogram">MA</span>
         </div>
-        <div className="mock-contact">alex.morgan@email.com&nbsp; · &nbsp;Addis Ababa&nbsp; · &nbsp;portfolio.example</div>
+        <div className="mock-contact">mebrie.awoke@example.com&nbsp; · &nbsp;Addis Ababa&nbsp; · &nbsp;portfolio.example</div>
         <div className="mock-rule" />
         <section className="mock-section"><h4>PROFILE</h4><p>Product designer creating thoughtful digital experiences through research, systems thinking and close collaboration.</p></section>
-        <section className="mock-section"><h4>EXPERIENCE</h4><div className="mock-entry"><b>Senior Product Designer</b><span>Northstar Studio · 2022 — Present</span><i /><i /><i className="short" /></div><div className="mock-entry"><b>Product Designer</b><span>Fieldwork Digital · 2019 — 2022</span><i /><i className="short" /></div></section>
-        <section className="mock-section"><h4>EDUCATION</h4><div className="mock-entry"><b>B.A. Interaction Design</b><span>Westbridge University · 2015 — 2019</span></div></section>
-        <section className="mock-section"><h4>CORE SKILLS</h4><div className="mock-skills"><span>Product strategy</span><span>Research</span><span>Prototyping</span><span>Design systems</span></div></section>
+        <section className="mock-section"><h4>EXPERIENCE</h4><div className="mock-entry"><b>Software Developer</b><span>Example Technology · 2022 — Present</span><i /><i /><i className="short" /></div><div className="mock-entry"><b>Backend Developer</b><span>Sample Projects · 2019 — 2022</span><i /><i className="short" /></div></section>
+        <section className="mock-section"><h4>EDUCATION</h4><div className="mock-entry"><b>B.Sc. Information Systems</b><span>University Example · 2015 — 2019</span></div></section>
+        <section className="mock-section"><h4>CORE SKILLS</h4><div className="mock-skills"><span>Python</span><span>Django</span><span>React</span><span>APIs</span></div></section>
       </div>
       <div className="landing-floating-note"><span><Check size={15} /></span><div><b>A clearer first impression</b><small>Thoughtful structure. Your real story.</small></div></div>
       <div className="landing-floating-label"><Sparkles size={14} /> Resume studio</div>
