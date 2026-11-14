@@ -3,6 +3,7 @@ from tempfile import TemporaryDirectory
 from urllib.parse import urlparse
 
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 from django.test import TestCase, override_settings
 from PIL import Image
 from rest_framework.test import APIRequestFactory
@@ -27,7 +28,7 @@ class SignedResumePhotoURLTests(TestCase):
             user=self.user,
             full_name="Mebrie Awoke",
             email="mebrie@example.com",
-            profile_photo=__import__("django.core.files.base", fromlist=["ContentFile"]).ContentFile(
+            profile_photo=ContentFile(
                 buffer.getvalue(),
                 name="mebrie-photo.png",
             ),
