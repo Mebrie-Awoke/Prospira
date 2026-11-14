@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'resumes',
     'accounts',
     'analyzer',
+    'billing',
 ]
 
 # CorsMiddleware must run before middleware that can return an early response.
