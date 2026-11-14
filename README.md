@@ -15,6 +15,7 @@ Prospira is a full-stack resume platform with a public landing page, authenticat
 - Save and revisit private analysis results without retaining source resume text or job descriptions.
 - Generate, edit, copy, and manage AI-assisted cover letters.
 - Compare resume evidence with a target job description in a dedicated job-match workspace.
+- Manage Free and Premium subscriptions with Chapa checkout and server-side payment verification.
 - Secure account access with JWT authentication.
 - Update account profile details and change passwords.
 
@@ -138,6 +139,11 @@ Open the local URL printed by Vite (usually `http://localhost:5173`).
 | GET, PATCH, DELETE | `/api/analyzer/cover-letters/{id}/` | View, edit, or delete a saved cover letter |
 | GET, PATCH | `/api/account/profile/` | Read or update the signed-in user's profile |
 | POST | `/api/account/password/` | Change the signed-in user's password |
+| GET | `/api/billing/subscription/` | Read the signed-in user's subscription and checkout availability |
+| POST | `/api/billing/checkout/` | Initialize a Premium checkout with Chapa |
+| GET | `/api/billing/chapa/callback/` | Verify a Chapa payment before granting Premium access |
+
+Billing uses one-time 30-day Premium purchases in ETB; automatic recurring billing is not enabled. The backend verifies every Chapa transaction server-to-server and checks the transaction reference, amount, currency, and payment status before activating Premium. Free accounts receive 10 AI requests per hour; active Premium accounts receive 100 per hour. Set `CHAPA_SECRET_KEY`, `CHAPA_PREMIUM_AMOUNT_ETB`, `SITE_URL`, and `FRONTEND_URL` before enabling checkout. The `299.00` ETB value in `.env.example` is only a sample price—choose and configure the actual price for your product.
 
 The analyzer accepts `resume_text` and an optional `job_description`. It returns a score, strengths, improvement suggestions, skills analysis, and recommendations. Successful feedback is saved to the authenticated user's private history; source resume text, uploaded files, and job descriptions are not stored. Cover letter generation requires resume text and a target job description and stores only the generated letter. Analyzer and cover-letter generation are authenticated and share a rate limit of 10 AI requests per user per hour.
 
@@ -165,6 +171,7 @@ The container runs database migrations before starting Gunicorn. The persistent 
 4. Add `VITE_API_BASE_URL=https://YOUR-RENDER-SERVICE.onrender.com/api` to the Vercel production environment.
 5. Redeploy after setting the environment variable.
 6. Copy the final Vercel origin into Render's `CORS_ALLOWED_ORIGINS` setting and redeploy the backend if it changes.
+7. Set `CHAPA_SECRET_KEY` from your Chapa merchant account, `CHAPA_PREMIUM_AMOUNT_ETB` to the price you choose in ETB, `SITE_URL` to the public Render API URL, and `FRONTEND_URL` to the public Vercel URL. Configure Chapa to use the callback URL shown in the checkout integration if required by your merchant settings. Test in Chapa sandbox mode before switching to live keys.
 
 Use HTTPS for both services. Configure a custom domain only after the default deployment passes health checks and the login, resume upload, PDF export, AI analysis, history, and cover-letter flows have been tested end to end.
 
