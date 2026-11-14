@@ -62,6 +62,25 @@ class AuthenticationAndResumeAPITests(APITestCase):
 		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 		self.assertIn("username", response.data)
 
+
+	def test_registration_rejects_duplicate_email_case_insensitively(self):
+		User.objects.create_user(
+			username="existing-email", email="person@example.com", password="SecureTest123!"
+		)
+		response = self.client.post(
+			self.register_url,
+			{
+				"username": "new-user",
+				"email": "PERSON@EXAMPLE.COM",
+				"password": "SecureTest123!",
+			},
+			format="json",
+		)
+
+		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+		self.assertIn("email", response.data)
+		self.assertIn("already registered", str(response.data["email"]).lower())
+
 	def test_valid_credentials_return_jwt_tokens(self):
 		User.objects.create_user(username="loginuser", password="SecureTest123!")
 		response = self.client.post(
