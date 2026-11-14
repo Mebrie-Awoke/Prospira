@@ -389,3 +389,58 @@ class ResumeDocumentExtractionTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("resume_file", response.data)
+
+
+class ResumeAnalysisHistoryTests(APITestCase):
+    def setUp(self):
+        from analyzer.models import ResumeAnalysis
+
+        self.user = get_user_model().objects.create_user(
+            username="history-owner",
+            password="test-password",
+        )
+        self.other_user = get_user_model().objects.create_user(
+            username="history-other",
+            password="test-password",
+        )
+        self.analysis = ResumeAnalysis.objects.create(
+            user=self.user,
+            overall_score=78,
+            summary="Good evidence of relevant experience.",
+            result=valid_analysis(),
+        )
+
+    def test_history_lists_only_the_authenticated_users_records(self):
+        from analyzer.models import ResumeAnalysis
+
+        ResumeAnalysis.objects.create(
+            user=self.other_user,
+            overall_score=40,
+            summary="Private result belonging to another user.",
+            result=valid_analysis(),
+        )
+        self.client.force_authenticate(self.user)
+        response = self.client.get(reverse("analysis-history"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], self.analysis.pk)
+
+    def test_history_requires_authentication(self):
+        response = self.client.get(reverse("analysis-history"))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_owner_can_delete_saved_analysis(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.delete(
+            reverse("analysis-history-detail", args=[self.analysis.pk])
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(self.analysis.__class__.objects.filter(pk=self.analysis.pk).exists())
+
+    def test_user_cannot_read_or_delete_another_users_analysis(self):
+        self.client.force_authenticate(self.other_user)
+        response = self.client.get(
+            reverse("analysis-history-detail", args=[self.analysis.pk])
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
