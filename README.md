@@ -131,7 +131,7 @@ Open the local URL printed by Vite (usually `http://localhost:5173`).
 | POST | `/api/token/refresh/` | Refresh an access token |
 | GET, POST | `/api/resumes/` | List or create resumes |
 | GET, PUT, PATCH, DELETE | `/api/resumes/{id}/` | Manage a resume |
-| GET | `/api/resumes/{id}/pdf/` | Download a professionally formatted PDF
+| GET | `/api/resumes/{id}/pdf/` | Download a professionally formatted PDF |
 | POST, DELETE | `/api/resumes/{id}/photo/` | Add or remove a profile photo |
 | POST | `/api/analyzer/analyze/` | Analyze resume text and save the result to private history |
 | GET | `/api/analyzer/history/` | List the signed-in user's saved analyses |
@@ -147,7 +147,7 @@ Open the local URL printed by Vite (usually `http://localhost:5173`).
 
 Billing uses one-time 30-day Premium purchases in ETB; automatic recurring billing is not enabled. The backend verifies every Chapa transaction server-to-server and checks the transaction reference, amount, currency, and payment status before activating Premium. Free accounts receive 10 AI requests per hour; active Premium accounts receive 100 per hour. Set `CHAPA_SECRET_KEY`, `CHAPA_PREMIUM_AMOUNT_ETB`, `SITE_URL`, and `FRONTEND_URL` before enabling checkout. The `299.00` ETB value in `.env.example` is only a sample price—choose and configure the actual price for your product.
 
-The analyzer accepts `resume_text` and an optional `job_description`. It returns a score, strengths, improvement suggestions, skills analysis, and recommendations. Successful feedback is saved to the authenticated user's private history; source resume text, uploaded files, and job descriptions are not stored. Cover letter generation requires resume text and a target job description and stores only the generated letter. Analyzer and cover-letter generation are authenticated and share a rate limit of 10 AI requests per user per hour.
+The analyzer accepts `resume_text` and an optional `job_description`. It returns a score, strengths, improvement suggestions, skills analysis, and recommendations. Successful feedback is saved to the authenticated user's private history; source resume text, uploaded files, and job descriptions are not stored. Cover letter generation requires resume text and a target job description and stores only the generated letter. Analyzer and cover-letter generation are authenticated and share a combined rate limit of 10 AI requests per hour on Free or 100 per hour on active Premium.
 
 
 ## Production deployment
