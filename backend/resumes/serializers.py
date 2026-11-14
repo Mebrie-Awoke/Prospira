@@ -1,5 +1,7 @@
 
 from django.contrib.auth import get_user_model, password_validation
+from django.core import signing
+from django.urls import reverse
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from .models import Resume
@@ -44,7 +46,11 @@ class ResumeSerializer(serializers.ModelSerializer):
         if not obj.profile_photo:
             return ""
         request = self.context.get("request")
-        photo_url = obj.profile_photo.url
+        token = signing.dumps(
+            {"resume_id": obj.pk, "photo_name": obj.profile_photo.name},
+            salt="prospira.resume-photo",
+        )
+        photo_url = reverse("resume-photo-file", kwargs={"token": token})
         return request.build_absolute_uri(photo_url) if request else photo_url
 
     def create(self, validated_data):
