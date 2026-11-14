@@ -104,7 +104,7 @@ class ResumePhotoAPITests(APITestCase):
             format="multipart",
         )
         self.assertEqual(upload.status_code, status.HTTP_200_OK)
-        self.assertTrue(upload.data["profile_photo_url"].endswith(".png"))
+        self.assertIn("/api/resume-photo/", upload.data["profile_photo_url"])
         self.resume.refresh_from_db()
         self.assertTrue(self.resume.profile_photo.storage.exists(self.resume.profile_photo.name))
 
