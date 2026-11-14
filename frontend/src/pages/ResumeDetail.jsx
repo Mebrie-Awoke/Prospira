@@ -14,7 +14,8 @@ export default function ResumeDetail() {
   const [resume, setResume] = useState(null)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState(location.state?.notice || '')
-  const downloadRequested = useRef(false)\n  const [confirmDelete, setConfirmDelete] = useState(false)
+  const downloadRequested = useRef(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
