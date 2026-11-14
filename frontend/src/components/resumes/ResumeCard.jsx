@@ -37,7 +37,7 @@ export default function ResumeCard({ resume, onDelete }) {
       <div className="resume-actions">
         <Link className="action-button action-view" to={`/resumes/${resume.id}`} aria-label={`Preview ${resume.resume_title || resume.full_name}`}><Eye size={15} /><span>Preview</span></Link>
         <Link className="action-button action-edit" to={`/resumes/${resume.id}/edit`} aria-label={`Edit ${resume.resume_title || resume.full_name}`}><Pencil size={14} /><span>Edit</span></Link>
-        <Link className="action-button action-edit" to={`/resumes/${resume.id}?print=1`} aria-label={`Download ${resume.resume_title || resume.full_name} as PDF`}><Download size={14} /><span>PDF</span></Link>
+        <Link className="action-button action-edit" to={`/resumes/${resume.id}?download=1`} aria-label={`Download ${resume.resume_title || resume.full_name} as PDF`}><Download size={14} /><span>PDF</span></Link>
         <button className="action-button action-delete" onClick={() => onDelete(resume)} aria-label={`Delete ${resume.resume_title || resume.full_name}`}><Trash2 size={14} /><span>Delete</span></button>
       </div>
     </article>
