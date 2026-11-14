@@ -16,6 +16,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DJANGO_DEBUG=False \
     DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,.ethiodeploy.app
 WORKDIR /app/backend
+RUN apt-get update \\
+    && apt-get install -y --no-install-recommends fonts-dejavu-core \\
+    && rm -rf /var/lib/apt/lists/*
 COPY backend/requirements.txt ./requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY backend/ ./
