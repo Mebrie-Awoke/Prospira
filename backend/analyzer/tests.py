@@ -297,6 +297,10 @@ class AnalyzerEndpointTests(APITestCase):
 
 
 class ResumeDocumentExtractionTests(APITestCase):
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+
     def make_docx(self):
         buffer = BytesIO()
         document = Document()
