@@ -1048,3 +1048,58 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .account-security-note { display: flex; align-items: center; gap: 8px; margin: 15px 2px; color: #627d98; font-size: 10px; }
 .account-security-note svg { flex: 0 0 auto; color: #0f9488; }
 @media (max-width: 560px) { .account-form-card { padding: 17px; } .account-form-card .form-grid-two { grid-template-columns: 1fr; } }
+
+
+/* Saved AI history, cover-letter editor, and job-fit workspace */
+.analysis-history-page, .cover-letter-page, .job-match-page { max-width: 1120px; margin: 0 auto; animation: page-in .28s ease both; }
+.analysis-history-privacy, .cover-letter-privacy, .job-match-disclaimer { display: flex; align-items: flex-start; gap: 9px; margin: 18px 0; padding: 13px 15px; border: 1px solid #d9e2ec; border-radius: 8px; color: #486581; background: #f8fbfc; font-size: 11px; line-height: 1.65; }
+.analysis-history-privacy svg { flex: 0 0 auto; margin-top: 1px; color: #0f766e; }
+.analysis-history-list, .cover-letter-list { display: grid; gap: 13px; }
+.analysis-history-card { padding: 21px; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: 0 5px 18px rgba(16,42,67,.035); }
+.analysis-history-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+.analysis-history-card-top h2 { margin: 8px 0; color: var(--ink); font-size: 15px; line-height: 1.5; }
+.analysis-history-card-top p { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--muted); font-size: 10px; }
+.analysis-history-score { min-width: 65px; padding: 9px; border-radius: 9px; color: #0f766e; background: #e6fffb; text-align: center; font-size: 22px; font-weight: 800; }
+.analysis-history-score small { font-size: 10px; }
+.analysis-history-details { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 13px; color: var(--ink-soft); font-size: 12px; }
+.analysis-history-details summary { cursor: pointer; color: #0f766e; font-weight: 700; }
+.analysis-history-result { padding: 10px 0; line-height: 1.7; }
+.analysis-history-result h3 { margin: 16px 0 5px; color: var(--ink); text-transform: capitalize; font-size: 12px; }
+.analysis-history-result p, .analysis-history-result ul { color: var(--muted); }
+.analysis-history-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+.cover-letter-layout, .job-match-layout { display: grid; grid-template-columns: minmax(0,.95fr) minmax(0,1.05fr); align-items: start; gap: 20px; }
+.cover-letter-form, .job-match-layout > form { margin-top: 0; display: grid; gap: 17px; }
+.cover-letter-form .account-form-heading, .job-match-layout .account-form-heading { margin-bottom: 2px; }
+.cover-letter-output, .job-match-results { min-width: 0; padding: 23px; border: 1px solid var(--line); border-radius: 10px; background: #fff; box-shadow: 0 5px 18px rgba(16,42,67,.035); }
+.cover-letter-output-head, .cover-letter-library-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.cover-letter-output-head h2 { margin: 7px 0 16px; color: var(--ink); font-size: 16px; }
+.cover-letter-output-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.cover-letter-title-edit { width: 100%; margin: 0 0 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); font-size: 12px; }
+.cover-letter-editor { width: 100%; min-height: 550px; padding: 20px; border: 1px solid var(--line); border-radius: 6px; color: #334e68; background: #fcfdfd; font: 12px/1.85 Georgia,serif; resize: vertical; }
+.cover-letter-library { margin-top: 22px; padding: 21px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.cover-letter-library-heading { align-items: center; margin-bottom: 15px; }
+.cover-letter-library-heading h2 { margin: 0; color: var(--ink); font-size: 15px; }
+.cover-letter-library-heading > span { color: var(--muted); font-size: 11px; }
+.cover-letter-list-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 7px; }
+.cover-letter-list-item.active { border-color: #99d8cf; background: #f4fffd; }
+.cover-letter-list-item > button:first-child { min-width: 0; display: grid; gap: 4px; border: 0; padding: 0; color: var(--ink); background: transparent; text-align: left; cursor: pointer; }
+.cover-letter-list-item strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.cover-letter-list-item small, .cover-letter-empty { color: var(--muted); font-size: 10px; }
+.cover-letter-list-item .icon-button { flex: 0 0 auto; color: #a33b3b; }
+.job-match-results { min-height: 500px; }
+.job-match-score { display: flex; align-items: baseline; gap: 13px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.job-match-score > strong { color: #0f766e; font-size: 48px; letter-spacing: -2px; }
+.job-match-score small { font-size: 15px; letter-spacing: 0; }
+.job-match-score > span { color: var(--muted); font-size: 11px; font-weight: 700; }
+.job-match-summary { color: var(--ink-soft); font-size: 12px; line-height: 1.8; }
+.job-match-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.job-match-columns section { padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fbfcfd; }
+.job-match-columns h3, .job-match-recommendations h3 { display: flex; align-items: center; gap: 7px; margin: 0 0 10px; color: var(--ink); font-size: 11px; text-transform: capitalize; }
+.job-match-columns h3 svg { color: #0f9488; }
+.job-match-columns ul, .job-match-recommendations ul { margin: 0; padding-left: 17px; color: var(--muted); font-size: 11px; line-height: 1.8; }
+.job-match-columns p { color: var(--muted); font-size: 11px; line-height: 1.7; }
+.job-match-recommendations { margin-top: 17px; padding-top: 15px; border-top: 1px solid var(--line); }
+.job-match-history-note { margin-top: 17px; color: var(--muted); font-size: 10px; }
+.job-match-history-note a, .analyzer-submit-note a { color: #0f766e; font-weight: 700; text-decoration: underline; }
+@media (max-width: 850px) { .cover-letter-layout, .job-match-layout { grid-template-columns: 1fr; } .cover-letter-editor { min-height: 420px; } }
+@media (max-width: 560px) { .analysis-history-card, .cover-letter-output, .job-match-results { padding: 16px; } .analysis-history-card-top { gap: 10px; } .analysis-history-card-top h2 { font-size: 13px; } .job-match-columns { grid-template-columns: 1fr; } .cover-letter-output-head { flex-direction: column; } }
