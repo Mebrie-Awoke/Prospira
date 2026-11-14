@@ -23,6 +23,26 @@ export const templates = [
     name: 'Executive',
     description: 'A polished, editorial presentation designed for experienced leaders.',
   },
+  {
+    id: 'technical',
+    name: 'Technical',
+    description: 'A structured layout that brings technical skills, projects and engineering experience forward.',
+  },
+  {
+    id: 'academic',
+    name: 'Academic',
+    description: 'A content-led format for education, research, publications and teaching experience.',
+  },
+  {
+    id: 'creative',
+    name: 'Creative',
+    description: 'A distinctive two-column layout with restrained color and a strong personal profile.',
+  },
+  {
+    id: 'compact',
+    name: 'Compact',
+    description: 'A space-conscious layout for experienced candidates with substantial career histories.',
+  },
 ]
 
 const sampleResume = {
