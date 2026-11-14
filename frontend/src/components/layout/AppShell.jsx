@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { FileText, House, Menu, Plus, Settings, UserRound, X, LogOut, ChevronDown, Sparkles, ScanSearch, History } from 'lucide-react'
+import { FileText, House, Menu, Plus, Settings, UserRound, X, LogOut, ChevronDown, Sparkles, ScanSearch, History, Mail } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 
 const navigation = [
@@ -9,6 +9,7 @@ const navigation = [
   { label: 'Create Resume', to: '/templates', icon: Plus },
   { label: 'Resume Analyzer', to: '/analyzer', icon: ScanSearch },
   { label: 'Analysis History', to: '/analysis-history', icon: History },
+  { label: 'Cover Letter', to: '/cover-letter', icon: Mail },
   { label: 'Profile', to: '/profile', icon: UserRound },
   { label: 'Settings', to: '/settings', icon: Settings },
 ]
