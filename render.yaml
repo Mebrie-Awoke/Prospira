@@ -26,6 +26,14 @@ services:
         value: "openai/gpt-oss-120b"
       - key: PORT
         value: "10000"
+      - key: CHAPA_SECRET_KEY
+        sync: false
+      - key: CHAPA_PREMIUM_AMOUNT_ETB
+        sync: false
+      - key: SITE_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
     disk:
       name: prospira-media
       mountPath: /app/backend/media
