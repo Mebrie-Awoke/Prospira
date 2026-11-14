@@ -191,7 +191,8 @@ Configure production values for `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALL
 ## Security & Privacy
 
 - Keep API keys and Django secrets on the server; never commit real credentials.
-- Resume endpoints restrict access to the authenticated owner.
+- Resume and billing APIs restrict account data to the authenticated owner.
+- Profile photo previews use short-lived signed URLs; raw media paths are not exposed by the API.
 - Submitted resume text is sent to Groq for AI analysis. Email addresses and phone numbers are redacted before submission.
 
 ## License
