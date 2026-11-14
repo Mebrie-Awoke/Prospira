@@ -17,11 +17,27 @@ export default function AuthPage({ mode }) {
 
   async function submit(event) {
     event.preventDefault()
+    const username = form.username.trim()
+    const email = form.email.trim().toLowerCase()
+
+    if (!username) {
+      setError('Please enter a username.')
+      return
+    }
+    if (isRegistering && !email) {
+      setError('Please enter your email address.')
+      return
+    }
+    if (isRegistering && form.password.length < 8) {
+      setError('Your password must contain at least 8 characters.')
+      return
+    }
+
     setBusy(true)
     setError('')
     try {
-      if (isRegistering) await register(form)
-      else await login({ username: form.username, password: form.password })
+      if (isRegistering) await register({ username, email, password: form.password })
+      else await login({ username, password: form.password })
       navigate('/', { replace: true })
     } catch (requestError) {
       setError(getApiError(requestError))
