@@ -7,8 +7,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.db import connection
 from django.http import JsonResponse
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.decorators.http import require_safe
+from django.views.static import serve as serve_media
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -37,5 +38,7 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Uploaded resume photos are served from the persistent media disk for previews and PDFs.
+urlpatterns += [
+    re_path(r"^media/(?P<path>.*)$", serve_media, {"document_root": settings.MEDIA_ROOT}),
+]
