@@ -12,7 +12,7 @@ Prospira is a full-stack resume platform with a public landing page, authenticat
 - Upload a profile photo.
 - Analyze resume content with AI and receive actionable feedback.
 - Compare resume skills with a target job description.
-- Secure account access with JWT authentication.
+- Secure account access with JWT authentication.\n- Update account profile details and change passwords.
 
 ## Tech Stack
 
@@ -118,7 +118,7 @@ Open the local URL printed by Vite (usually `http://localhost:5173`).
 | GET, POST | `/api/resumes/` | List or create resumes |
 | GET, PUT, PATCH, DELETE | `/api/resumes/{id}/` | Manage a resume |
 | POST, DELETE | `/api/resumes/{id}/photo/` | Add or remove a profile photo |
-| POST | `/api/analyzer/analyze/` | Analyze resume text |
+| POST | `/api/analyzer/analyze/` | Analyze resume text |\n| GET, PATCH | `/api/account/profile/` | Read or update the signed-in user's profile |\n| POST | `/api/account/password/` | Change the signed-in user's password |
 
 The analyzer accepts `resume_text` and an optional `job_description`. It returns a score, strengths, improvement suggestions, skills analysis, and recommendations. Authentication is required; requests are limited to 10 per user per hour.
 
