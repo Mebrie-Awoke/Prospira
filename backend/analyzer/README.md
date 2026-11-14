@@ -8,7 +8,7 @@ Set `GROQ_API_KEY` in `analyzer/.env`. Django loads that file from `BASE_DIR / "
 
 For deployment, set `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=False`, and `DJANGO_ALLOWED_HOSTS` to trusted hostnames.
 
-Install backend dependencies from `requirements.txt`, then run Django as usual. This feature does not persist uploaded documents, extracted text, or analysis results.
+Install backend dependencies from `requirements.txt`, then run Django as usual. The analyzer stores only the structured analysis feedback for the authenticated account. It does not persist uploaded documents, extracted resume text, or job descriptions. Users can list and delete their saved feedback through the history endpoints. Cover letter generation stores the generated letter, but not the source resume text or job description.
 
 ## Endpoint
 
@@ -44,4 +44,19 @@ The API returns:
 
 The score is an AI-generated assessment, not a hiring probability or guarantee. Missing job-description skills mean the resume text does not clearly evidence them; they do not mean the candidate lacks those skills. Formatting feedback is limited to what extracted text can show, not the visual layout of the original document.
 
-The endpoint is limited to 10 requests per user per hour. Provider-dependent tests mock Groq and do not make billable calls. Production still requires HTTPS, a review of provider data handling, and persistent storage for other features that save uploaded media.
+Free accounts are limited to 10 AI requests per hour; active Premium subscriptions receive 100 per hour. Requests are authenticated and scoped to the account. Provider-dependent tests mock Groq and do not make billable calls. Production still requires HTTPS, a review of provider data handling, and persistent storage for other features that save uploaded media.
+
+
+## Analysis history
+
+- `GET /api/analyzer/history/` lists saved feedback for the authenticated user.
+- `GET /api/analyzer/history/{id}/` retrieves one result.
+- `DELETE /api/analyzer/history/{id}/` permanently deletes one result.
+
+## Cover letters
+
+- `POST /api/analyzer/cover-letters/generate/` accepts `resume_text`, `job_description`, and an optional `tone` (`professional`, `confident`, or `warm`).
+- `GET /api/analyzer/cover-letters/` lists saved letters.
+- `GET`, `PATCH`, and `DELETE /api/analyzer/cover-letters/{id}/` manage an individual saved letter.
+
+Cover letters are generated from the supplied evidence. The model is instructed not to invent qualifications, achievements, employers, dates, or contact details.
