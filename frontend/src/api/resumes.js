@@ -17,6 +17,9 @@ export const resumesApi = {
     const { data } = await api.patch(`/resumes/${id}/`, resume)
     return data
   },
+  async downloadPdf(id) {
+    return api.get(`/resumes/${id}/pdf/`, { responseType: 'blob' })
+  },
   async uploadPhoto(id, photo) {
     const formData = new FormData()
     formData.append('photo', photo)
