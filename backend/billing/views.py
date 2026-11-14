@@ -1,11 +1,10 @@
 import os
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
-from urllib.parse import urlencode
 
 from django.shortcuts import redirect
 from django.utils import timezone
-from rest_framework import generics, status
+from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -60,6 +59,8 @@ class PremiumCheckoutView(APIView):
             if amount is None:
                 raise ChapaConfigurationError("The Premium subscription price has not been configured.")
             tx_ref = new_transaction_reference()
+            if not all(os.getenv(key) for key in ("CHAPA_SECRET_KEY", "SITE_URL", "FRONTEND_URL")):
+                raise ChapaConfigurationError("Chapa payment settings are incomplete.")
             transaction = PaymentTransaction.objects.create(
                 user=request.user,
                 tx_ref=tx_ref,
@@ -74,6 +75,9 @@ class PremiumCheckoutView(APIView):
                 tx_ref=tx_ref,
             )
         except ChapaConfigurationError as error:
+            if "transaction" in locals():
+                transaction.status = PaymentTransaction.Status.FAILED
+                transaction.save(update_fields=["status"])
             return Response({"detail": str(error)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         except ChapaProviderError as error:
             if "transaction" in locals():
@@ -128,7 +132,7 @@ class ChapaCallbackView(APIView):
         subscription, _ = Subscription.objects.get_or_create(user=transaction.user)
         start = max(now, subscription.current_period_end or now)
         subscription.plan = Subscription.Plan.PREMIUM
-        subscription.current_period_start = now
+        subscription.current_period_start = start
         subscription.current_period_end = start + timedelta(days=30)
         subscription.save(update_fields=[
             "plan", "current_period_start", "current_period_end", "updated_at"
