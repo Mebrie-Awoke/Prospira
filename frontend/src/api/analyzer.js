@@ -19,4 +19,19 @@ export const analyzerApi = {
   async deleteHistory(id) {
     await api.delete(`/analyzer/history/${id}/`)
   },
+  async generateCoverLetter(payload) {
+    const { data } = await api.post('/analyzer/cover-letters/generate/', payload)
+    return data
+  },
+  async getCoverLetters() {
+    const { data } = await api.get('/analyzer/cover-letters/')
+    return data
+  },
+  async updateCoverLetter(id, payload) {
+    const { data } = await api.patch(`/analyzer/cover-letters/${id}/`, payload)
+    return data
+  },
+  async deleteCoverLetter(id) {
+    await api.delete(`/analyzer/cover-letters/${id}/`)
+  },
 }
