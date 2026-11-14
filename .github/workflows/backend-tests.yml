@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - "backend/**"
+      - "Dockerfile"
+      - "render.yaml"
       - ".github/workflows/backend-tests.yml"
   pull_request:
     branches:
