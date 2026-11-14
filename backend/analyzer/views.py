@@ -1,8 +1,9 @@
 from rest_framework import generics, serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
+
+from billing.throttles import SubscriptionAwareAIThrottle
 
 from analyzer.history_serializers import (
     CoverLetterRequestSerializer,
@@ -28,7 +29,7 @@ from analyzer.services import (
 
 class ResumeAnalysisView(APIView):
     permission_classes = [IsAuthenticated]
-    throttle_classes = [ScopedRateThrottle]
+    throttle_classes = [SubscriptionAwareAIThrottle]
     throttle_scope = "analyzer"
 
     def post(self, request):
