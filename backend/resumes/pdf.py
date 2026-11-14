@@ -56,8 +56,10 @@ def _register_fonts():
 
 
 def _text(value):
-    return escape(str(value or "").strip()).replace("\n", "<br/>")
-
+    text = str(value or "").strip()
+    if not UNICODE_FONT_AVAILABLE:
+        text = text.encode("cp1252", "replace").decode("cp1252")
+    return escape(text).replace("\n", "<br/>")
 
 def _paragraph(value, style):
     value = _text(value)
