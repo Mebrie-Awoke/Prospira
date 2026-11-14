@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   color: #17233d;
   background: #f6f8fc;
   font-synthesis: none;
@@ -117,7 +117,7 @@ button { color: inherit; }
 .section-heading-row { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 15px; }
 .section-heading-row h2 { display: flex; align-items: center; gap: 9px; margin: 6px 0 4px; font-family: Manrope, sans-serif; font-size: 18px; line-height: 1.35; font-weight: 800; }
 .section-heading-row p { margin: 0; color: var(--muted); font-size: 11px; }
-.count-badge { min-width: 23px; height: 23px; display: inline-grid; place-items: center; padding: 0 6px; border-radius: 5px; color: var(--blue); background: var(--blue-pale); font-family: 'DM Sans', sans-serif; font-size: 10px; }
+.count-badge { min-width: 23px; height: 23px; display: inline-grid; place-items: center; padding: 0 6px; border-radius: 5px; color: var(--blue); background: var(--blue-pale); font-family: 'Inter', sans-serif; font-size: 10px; }
 .section-actions { display: flex; align-items: center; gap: 9px; }
 .shared-notice { min-height: 36px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 0 11px; border: 1px solid #e6eaf1; border-radius: 5px; color: #65718a; background: rgba(255,255,255,.7); }
 .shared-notice > span:nth-child(2) { color: #46536c; font-size: 10px; font-weight: 700; }
