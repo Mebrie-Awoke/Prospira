@@ -12,7 +12,9 @@ Prospira is a full-stack resume platform with a public landing page, authenticat
 - Download a template-styled PDF directly from the resume builder or preview.
 - Upload a profile photo.
 - Analyze resume content with AI and receive actionable feedback.
-- Compare resume skills with a target job description.
+- Save and revisit private analysis results without retaining source resume text or job descriptions.
+- Generate, edit, copy, and manage AI-assisted cover letters.
+- Compare resume evidence with a target job description in a dedicated job-match workspace.
 - Secure account access with JWT authentication.
 - Update account profile details and change passwords.
 
@@ -128,11 +130,11 @@ Open the local URL printed by Vite (usually `http://localhost:5173`).
 | GET, PUT, PATCH, DELETE | `/api/resumes/{id}/` | Manage a resume |
 | GET | `/api/resumes/{id}/pdf/` | Download a professionally formatted PDF
 | POST, DELETE | `/api/resumes/{id}/photo/` | Add or remove a profile photo |
-| POST | `/api/analyzer/analyze/` | Analyze resume text |
+| POST | `/api/analyzer/analyze/` | Analyze resume text and save the result to private history |\n| GET | `/api/analyzer/history/` | List the signed-in user's saved analyses |\n| GET, DELETE | `/api/analyzer/history/{id}/` | View or delete a saved analysis |\n| POST | `/api/analyzer/cover-letters/generate/` | Generate and save a tailored cover letter |\n| GET | `/api/analyzer/cover-letters/` | List the signed-in user's saved cover letters |\n| GET, PATCH, DELETE | `/api/analyzer/cover-letters/{id}/` | View, edit, or delete a saved cover letter |
 | GET, PATCH | `/api/account/profile/` | Read or update the signed-in user's profile |
 | POST | `/api/account/password/` | Change the signed-in user's password |
 
-The analyzer accepts `resume_text` and an optional `job_description`. It returns a score, strengths, improvement suggestions, skills analysis, and recommendations. Authentication is required; requests are limited to 10 per user per hour.
+The analyzer accepts `resume_text` and an optional `job_description`. It returns a score, strengths, improvement suggestions, skills analysis, and recommendations. Successful feedback is saved to the authenticated user's private history; source resume text, uploaded files, and job descriptions are not stored. Cover letter generation requires resume text and a target job description and stores only the generated letter. Analyzer and cover-letter generation are authenticated and share a rate limit of 10 AI requests per user per hour.
 
 ## Docker
 
