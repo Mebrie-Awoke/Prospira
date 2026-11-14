@@ -5,7 +5,7 @@ import { resumesApi } from '../api/resumes'
 import { getApiError } from '../utils/apiErrors'
 import ResumePreview, { templateCapabilities } from '../components/resumes/ResumePreview'
 import ProfilePhotoEditor from '../components/resumes/ProfilePhotoEditor'
-import { printResume } from '../utils/printResume'
+import { downloadResumePdf } from '../utils/downloadResumePdf'
 import { templates } from './Templates'
 
 const emptyResume = {
@@ -108,7 +108,7 @@ export default function ResumeBuilder() {
 
   useEffect(() => {
     if (!id) return
-    resumesApi.get(id).then((data) => setResume(normalizeResume(data))).catch((requestError) => setError(getApiError(requestError))).finally(() => setLoading(false))
+    resumesApi.get(id).then((data) => { setResume(normalizeResume(data)); setSaved(true) }).catch((requestError) => setError(getApiError(requestError))).finally(() => setLoading(false))
   }, [id])
 
   useEffect(() => () => {
@@ -190,7 +190,20 @@ export default function ResumeBuilder() {
   }
 
   async function downloadPdf() {
-    await printResume()
+    if (!id) {
+      setError('Save your resume before downloading its PDF.')
+      return
+    }
+    if (!saved) {
+      setError('Save your latest changes before downloading the PDF.')
+      return
+    }
+    setError('')
+    try {
+      await downloadResumePdf(id, resume.resume_title || resume.full_name)
+    } catch (requestError) {
+      setError(getApiError(requestError))
+    }
   }
 
   const templatePhoto = templateCapabilities[resume.template_identifier] || templateCapabilities.classic
