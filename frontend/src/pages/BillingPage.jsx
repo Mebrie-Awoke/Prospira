@@ -23,8 +23,8 @@ export default function BillingPage() {
       ])
       setSubscription(plan)
       setCustomer({
-        first_name: profile.first_name || 'Mebrie',
-        last_name: profile.last_name || 'Awoke',
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
         email: profile.email || '',
       })
     } catch (requestError) {
