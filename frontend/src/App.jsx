@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './auth/AuthContext'
 import AppShell from './components/layout/AppShell'
 import AuthPage from './pages/AuthPage'
 import Analyzer from './pages/Analyzer'
+import AnalysisHistory from './pages/AnalysisHistory'
 import Dashboard from './pages/Dashboard'
 import LandingPage from './pages/LandingPage'
 import ProfilePage from './pages/ProfilePage'
@@ -31,6 +32,7 @@ function AppRoutes() {
         <Route path="/resumes" element={<MyResumes />} />
         <Route path="/templates" element={<Templates />} />
         <Route path="/analyzer" element={<Analyzer />} />
+        <Route path="/analysis-history" element={<AnalysisHistory />} />
         <Route path="/resumes/new" element={<ResumeBuilder />} />
         <Route path="/resumes/:id" element={<ResumeDetail />} />
         <Route path="/resumes/:id/edit" element={<ResumeBuilder />} />
