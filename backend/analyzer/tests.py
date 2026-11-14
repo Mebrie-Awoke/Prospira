@@ -223,7 +223,8 @@ class AnalyzerEndpointTests(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, expected)
+        self.assertEqual({key: response.data[key] for key in expected}, expected)
+        self.assertIn('id', response.data)
         analyze_resume_mock.assert_called_once_with(
             resume_text="Example resume",
             job_description="Target job",
@@ -359,7 +360,8 @@ class ResumeDocumentExtractionTests(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, expected)
+        self.assertEqual({key: response.data[key] for key in expected}, expected)
+        self.assertIn('id', response.data)
         self.assertIn(
             "Python developer with Django experience.",
             analyze_resume_mock.call_args.kwargs["resume_text"],
