@@ -39,3 +39,5 @@ jobs:
         run: python manage.py makemigrations --check --dry-run
       - name: Run backend tests
         run: python manage.py test
+      - name: Build production Docker image
+        run: docker build -t prospira:ci ..
