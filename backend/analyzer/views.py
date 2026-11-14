@@ -4,7 +4,11 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from analyzer.history_serializers import (\n    CoverLetterRequestSerializer,\n    CoverLetterSerializer,\n    ResumeAnalysisHistorySerializer,\n)
+from analyzer.history_serializers import (
+    CoverLetterRequestSerializer,
+    CoverLetterSerializer,
+    ResumeAnalysisHistorySerializer,
+)
 from analyzer.models import CoverLetter, ResumeAnalysis
 from analyzer.serializers import (
     ResumeAnalysisRequestSerializer,
@@ -18,6 +22,7 @@ from analyzer.services import (
     ResumeExtractionError,
     analyze_resume,
     extract_resume_text,
+    generate_cover_letter,
 )
 
 
