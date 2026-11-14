@@ -6,6 +6,7 @@ import Analyzer from './pages/Analyzer'
 import AnalysisHistory from './pages/AnalysisHistory'
 import CoverLetterGenerator from './pages/CoverLetterGenerator'
 import JobMatch from './pages/JobMatch'
+import BillingPage from './pages/BillingPage'
 import Dashboard from './pages/Dashboard'
 import LandingPage from './pages/LandingPage'
 import ProfilePage from './pages/ProfilePage'
@@ -37,6 +38,7 @@ function AppRoutes() {
         <Route path="/analysis-history" element={<AnalysisHistory />} />
         <Route path="/cover-letter" element={<CoverLetterGenerator />} />
         <Route path="/job-match" element={<JobMatch />} />
+        <Route path="/billing" element={<BillingPage />} />
         <Route path="/resumes/new" element={<ResumeBuilder />} />
         <Route path="/resumes/:id" element={<ResumeDetail />} />
         <Route path="/resumes/:id/edit" element={<ResumeBuilder />} />
