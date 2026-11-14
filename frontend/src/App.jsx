@@ -4,6 +4,7 @@ import AppShell from './components/layout/AppShell'
 import AuthPage from './pages/AuthPage'
 import Analyzer from './pages/Analyzer'
 import Dashboard from './pages/Dashboard'
+import LandingPage from './pages/LandingPage'
 import MyResumes from './pages/MyResumes'
 import PlaceholderPage from './pages/PlaceholderPage'
 import ResumeDetail from './pages/ResumeDetail'
@@ -16,12 +17,14 @@ function ProtectedLayout() {
 }
 
 function AppRoutes() {
+  const { isAuthenticated } = useAuth()
+
   return (
     <Routes>
-      <Route path="/login" element={<AuthPage mode="login" />} />
-      <Route path="/register" element={<AuthPage mode="register" />} />
+      <Route path="/" element={isAuthenticated ? <Dashboard /> : <LandingPage />} />
+      <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <AuthPage mode="login" />} />
+      <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <AuthPage mode="register" />} />
       <Route element={<ProtectedLayout />}>
-        <Route path="/" element={<Dashboard />} />
         <Route path="/resumes" element={<MyResumes />} />
         <Route path="/templates" element={<Templates />} />
         <Route path="/analyzer" element={<Analyzer />} />
