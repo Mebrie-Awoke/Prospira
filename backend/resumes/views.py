@@ -65,3 +65,18 @@ class ResumePhotoAPIView(APIView):
             resume.profile_photo.delete(save=False)
             resume.save(update_fields=("profile_photo", "updated_at"))
         return Response(ResumeSerializer(resume, context={"request": request}).data)
+
+
+class ResumePDFAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        resume = get_object_or_404(Resume.objects.filter(user=request.user), pk=pk)
+        from .pdf import build_resume_pdf
+
+        pdf_content, filename = build_resume_pdf(resume)
+        response = Response(pdf_content, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        response["Content-Length"] = str(len(pdf_content))
+        response["Cache-Control"] = "private, no-store"
+        return response
