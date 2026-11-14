@@ -125,6 +125,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ("id", "username", "email", "password")
         read_only_fields = ("id",)
 
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError(
+                "This email address is already registered. Sign in instead."
+            )
+        return value
+
     def validate_password(self, value):
         try:
             password_validation.validate_password(value)
