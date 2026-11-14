@@ -1002,3 +1002,35 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 @media (prefers-reduced-motion: reduce) {
   .landing-page *, .landing-page *::before, .landing-page *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Additional resume template systems */
+.preview-technical-header { padding: 25px 29px 18px; border-bottom: 3px solid #0f9488; }
+.preview-technical-grid { display: grid; grid-template-columns: 31% 1fr; gap: 22px; padding: 21px 28px; }
+.preview-technical-grid > aside { padding-right: 15px; border-right: 1px solid #d9e2ec; }
+.preview-technical-grid .preview-section { margin-bottom: 17px; }
+.preview-technical-grid .preview-section h3 { color: #0f766e; }
+.preview-academic-header { padding: 28px 34px 18px; border-bottom: 1px solid #102a43; }
+.preview-academic-header .preview-header { border: 0; padding: 0; }
+.preview-academic-body { padding: 18px 34px; }
+.preview-academic-body .preview-section { margin: 0 0 15px; }
+.preview-academic-body .preview-section h3 { padding-bottom: 5px; border-bottom: 1px solid #d9e2ec; color: #102a43; }
+.preview-creative-header { padding: 28px 30px 22px; color: white; background: #102a43; }
+.preview-creative-header .preview-header h1, .preview-creative-header .preview-professional-title { color: white; }
+.preview-creative-header .preview-professional-title { color: #8ce5d8; }
+.preview-creative-header .resume-preview-contact, .preview-creative-header .resume-preview-contact span { color: #d9e2ec; }
+.preview-creative-header .preview-summary { max-width: 90%; margin: 17px 0 0; color: #d9e2ec; }
+.preview-creative-grid { display: grid; grid-template-columns: 34% 1fr; gap: 21px; padding: 23px 28px; }
+.preview-creative-grid > aside { padding-right: 14px; border-right: 1px solid #d9e2ec; }
+.preview-creative-grid .preview-section { margin-bottom: 16px; }
+.preview-creative-grid .preview-section h3 { color: #0f766e; }
+.preview-compact-header { padding: 18px 25px 12px; border-bottom: 1px solid #d9e2ec; }
+.preview-compact-body { padding: 12px 25px; }
+.preview-compact-body .preview-section { margin: 0 0 10px; }
+.preview-compact-body .preview-section h3 { margin-bottom: 5px; font-size: 8px; }
+.preview-compact-body .preview-entry { margin-top: 5px; }
+.preview-compact-body .preview-entry p, .preview-compact-body .preview-section > p { font-size: 8px; line-height: 1.4; }
+.preview-compact-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 560px) {
+  .preview-technical-grid, .preview-creative-grid { grid-template-columns: 1fr; }
+  .preview-technical-grid > aside, .preview-creative-grid > aside { padding-right: 0; border-right: 0; border-bottom: 1px solid #d9e2ec; padding-bottom: 10px; }
+}
