@@ -1,4 +1,5 @@
 
+import hashlib
 import mimetypes
 
 from django.core import signing
@@ -102,12 +103,12 @@ class ResumePhotoFileAPIView(APIView):
         except (BadSignature, SignatureExpired):
             return Response({"detail": "This photo link has expired."}, status=status.HTTP_404_NOT_FOUND)
 
-        resume = get_object_or_404(
-            Resume,
-            pk=payload.get("resume_id"),
-            profile_photo=payload.get("photo_name"),
-        )
-        photo = default_storage.open(resume.profile_photo.name, "rb")
+        resume = get_object_or_404(Resume, pk=payload.get("resume_id"))
+        photo_name = resume.profile_photo.name
+        expected_hash = hashlib.sha256(photo_name.encode()).hexdigest() if photo_name else ""
+        if not photo_name or payload.get("photo_hash") != expected_hash or not default_storage.exists(photo_name):
+            return Response({"detail": "This photo link has expired."}, status=status.HTTP_404_NOT_FOUND)
+        photo = default_storage.open(photo_name, "rb")
         content_type = mimetypes.guess_type(resume.profile_photo.name)[0] or "application/octet-stream"
         response = FileResponse(photo, content_type=content_type)
         response["Cache-Control"] = "private, max-age=300"
