@@ -75,6 +75,68 @@ export default function ResumePreview({ resume, template = 'classic', compact = 
             </aside>
           </div>
         </>
+      ) : template === 'technical' ? (
+        <>
+          <div className="preview-technical-header">{header}</div>
+          <div className="preview-technical-grid">
+            <aside>
+              <Section title="Technical skills"><div className="preview-skills">{skills.map((skill) => <span key={skill}>{skill}</span>)}</div></Section>
+              <Section title="Education">{education}</Section>
+              <Section title="Certifications"><p>{list(resume.certifications)}</p></Section>
+              <Section title="Languages"><p>{list(resume.languages)}</p></Section>
+            </aside>
+            <div>
+              <Section title="Professional profile">{summary}</Section>
+              <Section title="Engineering experience">{experience}</Section>
+              <Section title="Selected projects">{projects}</Section>
+            </div>
+          </div>
+        </>
+      ) : template === 'academic' ? (
+        <>
+          <div className="preview-academic-header">{header}</div>
+          <div className="preview-academic-body">
+            <Section title="Research and professional profile">{summary}</Section>
+            <Section title="Education and qualifications">{education}</Section>
+            <Section title="Professional and teaching experience">{experience}</Section>
+            <Section title="Selected projects and research">{projects}</Section>
+            <Section title="Areas of expertise"><p>{list(skills)}</p></Section>
+            <Section title="Certifications and awards"><p>{list(resume.certifications)}</p></Section>
+            <Section title="Languages"><p>{list(resume.languages)}</p></Section>
+          </div>
+        </>
+      ) : template === 'creative' ? (
+        <>
+          <div className="preview-creative-header">{header}{summary}</div>
+          <div className="preview-creative-grid">
+            <aside>
+              <Section title="Expertise"><div className="preview-skills">{skills.map((skill) => <span key={skill}>{skill}</span>)}</div></Section>
+              <Section title="Education">{education}</Section>
+              <Section title="Credentials"><p>{list(resume.certifications)}</p></Section>
+              <Section title="Languages"><p>{list(resume.languages)}</p></Section>
+            </aside>
+            <div>
+              <Section title="Experience">{experience}</Section>
+              <Section title="Featured projects">{projects}</Section>
+            </div>
+          </div>
+        </>
+      ) : template === 'compact' ? (
+        <>
+          <div className="preview-compact-header">{header}</div>
+          <div className="preview-compact-body">
+            <Section title="Summary">{summary}</Section>
+            <Section title="Experience">{experience}</Section>
+            <div className="preview-compact-columns">
+              <Section title="Education">{education}</Section>
+              <Section title="Skills"><p>{list(skills)}</p></Section>
+            </div>
+            <div className="preview-compact-columns">
+              <Section title="Projects">{projects}</Section>
+              <div><Section title="Certifications"><p>{list(resume.certifications)}</p></Section><Section title="Languages"><p>{list(resume.languages)}</p></Section></div>
+            </div>
+          </div>
+        </>
       ) : template === 'minimalist' ? (
         <>
           <div className="preview-minimal-header">{header}{summary}</div>
@@ -114,4 +176,8 @@ export const templateCapabilities = {
   'modern-blue': { supportsPhoto: true, photoShape: 'circle' },
   minimalist: { supportsPhoto: false, photoShape: null },
   executive: { supportsPhoto: true, photoShape: 'square' },
+  technical: { supportsPhoto: false, photoShape: null },
+  academic: { supportsPhoto: false, photoShape: null },
+  creative: { supportsPhoto: true, photoShape: 'circle' },
+  compact: { supportsPhoto: false, photoShape: null },
 }
