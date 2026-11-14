@@ -119,6 +119,7 @@ class ChapaCallbackTests(APITestCase):
         "FRONTEND_URL": "https://prospira.vercel.app",
     })
     def test_checkout_initializes_chapa_and_records_pending_transaction(self, post_mock):
+        self.client.force_authenticate(user=self.user)
         response_from_provider = post_mock.return_value
         response_from_provider.raise_for_status.return_value = None
         response_from_provider.json.return_value = {
