@@ -29,6 +29,7 @@ Prospira is a full-stack resume platform with a public landing page, authenticat
 | AI | Groq API |
 | Database | SQLite (development), PostgreSQL (supported) |
 | PDF generation | ReportLab |
+| Payments | Chapa (ETB checkout and server-side verification) |
 | Deployment | Docker, Gunicorn, WhiteNoise |
 
 ## Project Structure
@@ -36,7 +37,8 @@ Prospira is a full-stack resume platform with a public landing page, authenticat
 ```text
 Prospira/
 ├── backend/
-│   ├── analyzer/       # AI resume analysis
+│   ├── analyzer/       # AI resume analysis and cover letters
+│   ├── billing/        # Subscription plans and Chapa payments
 │   ├── config/         # Django configuration
 │   ├── resumes/        # Resume APIs and models
 │   └── manage.py
