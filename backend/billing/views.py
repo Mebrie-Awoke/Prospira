@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
 
+from django.db import transaction
 from django.shortcuts import redirect
 from django.utils import timezone
 from rest_framework import status
@@ -124,17 +125,21 @@ class ChapaCallbackView(APIView):
             return redirect(f"{frontend_url}/billing?payment=failed")
 
         now = timezone.now()
-        transaction.status = PaymentTransaction.Status.SUCCESS
-        transaction.provider_reference = str(data.get("reference", ""))[:120]
-        transaction.verified_at = now
-        transaction.save(update_fields=["status", "provider_reference", "verified_at"])
+        with transaction.atomic():
+            locked_transaction = PaymentTransaction.objects.select_for_update().get(pk=transaction.pk)
+            if locked_transaction.status != PaymentTransaction.Status.SUCCESS:
+                locked_transaction.status = PaymentTransaction.Status.SUCCESS
+                locked_transaction.provider_reference = str(data.get("reference", ""))[:120]
+                locked_transaction.verified_at = now
+                locked_transaction.save(update_fields=["status", "provider_reference", "verified_at"])
 
-        subscription, _ = Subscription.objects.get_or_create(user=transaction.user)
-        start = max(now, subscription.current_period_end or now)
-        subscription.plan = Subscription.Plan.PREMIUM
-        subscription.current_period_start = start
-        subscription.current_period_end = start + timedelta(days=30)
-        subscription.save(update_fields=[
-            "plan", "current_period_start", "current_period_end", "updated_at"
-        ])
+                subscription, _ = Subscription.objects.get_or_create(user=locked_transaction.user)
+                subscription = Subscription.objects.select_for_update().get(pk=subscription.pk)
+                start = max(now, subscription.current_period_end or now)
+                subscription.plan = Subscription.Plan.PREMIUM
+                subscription.current_period_start = start
+                subscription.current_period_end = start + timedelta(days=30)
+                subscription.save(update_fields=[
+                    "plan", "current_period_start", "current_period_end", "updated_at"
+                ])
         return redirect(f"{frontend_url}/billing?payment=success")
