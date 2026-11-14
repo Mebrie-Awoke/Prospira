@@ -10,6 +10,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { analyzerApi } from '../api/analyzer'
 import { getApiError } from '../utils/apiErrors'
 
@@ -188,7 +189,7 @@ export default function Analyzer() {
 
       <div className="analyzer-privacy-note">
         <AlertCircle size={17} />
-        <span>Your resume is processed temporarily for analysis. Contact details are redacted before text is sent to Groq. Prospira does not save the uploaded document or extracted text.</span>
+        <span>Your resume is processed temporarily for analysis. Contact details are redacted before text is sent to Groq. We save only the generated feedback in your private analysis history—not your uploaded file, resume text, or job description.</span>
       </div>
 
       <div className="analyzer-layout">
@@ -287,7 +288,7 @@ export default function Analyzer() {
               Cancel analysis
             </button>
           )}
-          <p className="analyzer-submit-note">Files are limited to 5 MB and 10 PDF pages. Scanned/image-only PDFs are not supported yet. Text is sent to Groq for analysis and is not stored by Prospira.</p>
+          <p className="analyzer-submit-note">Files are limited to 5 MB and 10 PDF pages. Scanned/image-only PDFs are not supported yet. <Link to="/analysis-history">View saved analyses</Link>.</p>
         </form>
 
         <aside className="analyzer-results" aria-label="Analysis results" aria-live="polite">
