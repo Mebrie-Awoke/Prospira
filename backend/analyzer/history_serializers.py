@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from analyzer.models import ResumeAnalysis
+from analyzer.models import CoverLetter, ResumeAnalysis
 
 
 class ResumeAnalysisHistorySerializer(serializers.ModelSerializer):
@@ -29,8 +29,6 @@ class CoverLetterRequestSerializer(serializers.Serializer):
 
 class CoverLetterSerializer(serializers.ModelSerializer):
     class Meta:
-        from analyzer.models import CoverLetter
-
         model = CoverLetter
         fields = ("id", "title", "content", "created_at", "updated_at")
         read_only_fields = ("id", "created_at", "updated_at")
