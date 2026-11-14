@@ -130,7 +130,12 @@ Open the local URL printed by Vite (usually `http://localhost:5173`).
 | GET, PUT, PATCH, DELETE | `/api/resumes/{id}/` | Manage a resume |
 | GET | `/api/resumes/{id}/pdf/` | Download a professionally formatted PDF
 | POST, DELETE | `/api/resumes/{id}/photo/` | Add or remove a profile photo |
-| POST | `/api/analyzer/analyze/` | Analyze resume text and save the result to private history |\n| GET | `/api/analyzer/history/` | List the signed-in user's saved analyses |\n| GET, DELETE | `/api/analyzer/history/{id}/` | View or delete a saved analysis |\n| POST | `/api/analyzer/cover-letters/generate/` | Generate and save a tailored cover letter |\n| GET | `/api/analyzer/cover-letters/` | List the signed-in user's saved cover letters |\n| GET, PATCH, DELETE | `/api/analyzer/cover-letters/{id}/` | View, edit, or delete a saved cover letter |
+| POST | `/api/analyzer/analyze/` | Analyze resume text and save the result to private history |
+| GET | `/api/analyzer/history/` | List the signed-in user's saved analyses |
+| GET, DELETE | `/api/analyzer/history/{id}/` | View or delete a saved analysis |
+| POST | `/api/analyzer/cover-letters/generate/` | Generate and save a tailored cover letter |
+| GET | `/api/analyzer/cover-letters/` | List the signed-in user's saved cover letters |
+| GET, PATCH, DELETE | `/api/analyzer/cover-letters/{id}/` | View, edit, or delete a saved cover letter |
 | GET, PATCH | `/api/account/profile/` | Read or update the signed-in user's profile |
 | POST | `/api/account/password/` | Change the signed-in user's password |
 
