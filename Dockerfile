@@ -17,7 +17,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,.ethiodeploy.app
 WORKDIR /app/backend
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends fonts-dejavu-core \
+    && apt-get install -y --no-install-recommends fonts-dejavu-core gosu \
     && rm -rf /var/lib/apt/lists/*
 COPY backend/requirements.txt ./requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
@@ -29,6 +29,6 @@ RUN test -f ./frontend_dist/index.html \
     && useradd --system --gid app --create-home --home-dir /home/app app \
     && mkdir -p /app/backend/media \
     && chown app:app /app/backend/media
-USER app
+USER root
 EXPOSE 8000
-CMD ["sh", "-c", "python manage.py migrate --noinput && exec gunicorn --bind 0.0.0.0:${PORT:-8000} config.wsgi:application"]
+CMD ["sh", "-c", "chown app:app /app/backend/media && exec gosu app sh -c 'python manage.py migrate --noinput && exec gunicorn --bind 0.0.0.0:${PORT:-8000} config.wsgi:application'"]
