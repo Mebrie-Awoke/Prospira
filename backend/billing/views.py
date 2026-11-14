@@ -2,7 +2,7 @@ import os
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
 
-from django.db import transaction
+from django.db import transaction as db_transaction
 from django.shortcuts import redirect
 from django.utils import timezone
 from rest_framework import status
@@ -125,7 +125,7 @@ class ChapaCallbackView(APIView):
             return redirect(f"{frontend_url}/billing?payment=failed")
 
         now = timezone.now()
-        with transaction.atomic():
+        with db_transaction.atomic():
             locked_transaction = PaymentTransaction.objects.select_for_update().get(pk=transaction.pk)
             if locked_transaction.status != PaymentTransaction.Status.SUCCESS:
                 locked_transaction.status = PaymentTransaction.Status.SUCCESS
