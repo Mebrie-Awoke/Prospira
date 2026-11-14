@@ -1,4 +1,6 @@
 
+import hashlib
+
 from django.contrib.auth import get_user_model, password_validation
 from django.core import signing
 from django.urls import reverse
@@ -47,7 +49,7 @@ class ResumeSerializer(serializers.ModelSerializer):
             return ""
         request = self.context.get("request")
         token = signing.dumps(
-            {"resume_id": obj.pk, "photo_name": obj.profile_photo.name},
+            {"resume_id": obj.pk, "photo_hash": hashlib.sha256(obj.profile_photo.name.encode()).hexdigest()},
             salt="prospira.resume-photo",
         )
         photo_url = reverse("resume-photo-file", kwargs={"token": token})
