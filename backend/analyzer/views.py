@@ -99,7 +99,7 @@ class ResumeAnalysisHistoryDetailView(generics.RetrieveDestroyAPIView):
 
 class CoverLetterGenerateView(APIView):
     permission_classes = [IsAuthenticated]
-    throttle_classes = [ScopedRateThrottle]
+    throttle_classes = [SubscriptionAwareAIThrottle]
     throttle_scope = "analyzer"
 
     def post(self, request):
