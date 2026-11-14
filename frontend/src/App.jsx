@@ -21,7 +21,9 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={isAuthenticated ? <Dashboard /> : <LandingPage />} />
+      <Route path="/" element={isAuthenticated ? <ProtectedLayout /> : <LandingPage />}>
+        <Route index element={<Dashboard />} />
+      </Route>
       <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <AuthPage mode="login" />} />
       <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <AuthPage mode="register" />} />
       <Route element={<ProtectedLayout />}>
