@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AlertTriangle, ArrowLeft, Download, LoaderCircle, Pencil, Trash2, X } from 'lucide-react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { resumesApi } from '../api/resumes'
 import { getApiError } from '../utils/apiErrors'
 import ResumePreview from '../components/resumes/ResumePreview'
-import { printResume } from '../utils/printResume'
+import { downloadResumePdf } from '../utils/downloadResumePdf'
 
 export default function ResumeDetail() {
   const { id } = useParams()
@@ -14,7 +14,7 @@ export default function ResumeDetail() {
   const [resume, setResume] = useState(null)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState(location.state?.notice || '')
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const downloadRequested = useRef(false)\n  const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
@@ -26,10 +26,21 @@ export default function ResumeDetail() {
   }, [id])
 
   useEffect(() => {
-    if (resume && searchParams.get('print') === '1') {
-      window.setTimeout(() => window.print(), 250)
+    if (resume && searchParams.get('download') === '1' && !downloadRequested.current) {
+      downloadRequested.current = true
+      downloadResumePdf(id, resume.resume_title || resume.full_name)
+        .catch((requestError) => setError(getApiError(requestError)))
     }
-  }, [resume, searchParams])
+  }, [id, resume, searchParams])
+
+  async function handleDownload() {
+    setError('')
+    try {
+      await downloadResumePdf(id, resume.resume_title || resume.full_name)
+    } catch (requestError) {
+      setError(getApiError(requestError))
+    }
+  }
 
   async function deleteResume() {
     setDeleting(true)
@@ -59,7 +70,7 @@ export default function ResumeDetail() {
         <Link to="/resumes" className="back-link"><ArrowLeft size={16} /> Back to resumes</Link>
         <div className="detail-actions">
           <Link to={`/resumes/${id}/edit`} className="button button-outline"><Pencil size={15} /> Edit resume</Link>
-          <button onClick={printResume} className="button button-primary"><Download size={15} /> Download PDF</button>
+          <button onClick={handleDownload} className="button button-primary"><Download size={15} /> Download PDF</button>
           <button onClick={() => setConfirmDelete(true)} className="button button-danger"><Trash2 size={15} /> Delete</button>
         </div>
       </div>
