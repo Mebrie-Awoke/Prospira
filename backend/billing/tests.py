@@ -4,7 +4,6 @@ from decimal import Decimal
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
@@ -39,13 +38,14 @@ class BillingStatusTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
-class ChapaCallbackTests(TestCase):
+class ChapaCallbackTests(APITestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(
             username="payment-owner",
             email="payment@example.com",
             password="test-password",
         )
+        self.client.force_authenticate(self.user)
         self.transaction = PaymentTransaction.objects.create(
             user=self.user,
             tx_ref="prospira-test-payment",
