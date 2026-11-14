@@ -1,7 +1,11 @@
 
+import mimetypes
+
+from django.core import signing
 from django.core.files.storage import default_storage
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.core.signing import BadSignature, SignatureExpired
 from rest_framework import generics, serializers, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -80,4 +84,32 @@ class ResumePDFAPIView(APIView):
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         response["Content-Length"] = str(len(pdf_content))
         response["Cache-Control"] = "private, no-store"
+        return response
+
+
+
+class ResumePhotoFileAPIView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request, token):
+        try:
+            payload = signing.loads(
+                token,
+                salt="prospira.resume-photo",
+                max_age=300,
+            )
+        except (BadSignature, SignatureExpired):
+            return Response({"detail": "This photo link has expired."}, status=status.HTTP_404_NOT_FOUND)
+
+        resume = get_object_or_404(
+            Resume,
+            pk=payload.get("resume_id"),
+            profile_photo=payload.get("photo_name"),
+        )
+        photo = default_storage.open(resume.profile_photo.name, "rb")
+        content_type = mimetypes.guess_type(resume.profile_photo.name)[0] or "application/octet-stream"
+        response = FileResponse(photo, content_type=content_type)
+        response["Cache-Control"] = "private, max-age=300"
+        response["X-Content-Type-Options"] = "nosniff"
         return response
