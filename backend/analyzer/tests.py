@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 import httpx
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from docx import Document
@@ -166,6 +167,7 @@ class AnalyzerServiceTests(APITestCase):
 
 class AnalyzerEndpointTests(APITestCase):
     def setUp(self):
+        cache.clear()
         self.user = get_user_model().objects.create_user(
             username="analyzer-user",
             password="test-password",
@@ -298,7 +300,6 @@ class AnalyzerEndpointTests(APITestCase):
 
 class ResumeDocumentExtractionTests(APITestCase):
     def setUp(self):
-        from django.core.cache import cache
         cache.clear()
 
     def make_docx(self):
@@ -399,6 +400,7 @@ class ResumeDocumentExtractionTests(APITestCase):
 
 class ResumeAnalysisHistoryTests(APITestCase):
     def setUp(self):
+        cache.clear()
         from analyzer.models import ResumeAnalysis
 
         self.user = get_user_model().objects.create_user(
@@ -454,6 +456,7 @@ class ResumeAnalysisHistoryTests(APITestCase):
 
 class CoverLetterEndpointTests(APITestCase):
     def setUp(self):
+        cache.clear()
         self.user = get_user_model().objects.create_user(
             username="cover-letter-owner",
             password="test-password",
