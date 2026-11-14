@@ -13,6 +13,10 @@ export default function ResumeCard({ resume, onDelete }) {
     'modern-blue': 'Modern Blue',
     minimalist: 'Minimalist',
     executive: 'Executive',
+    technical: 'Technical',
+    academic: 'Academic',
+    creative: 'Creative',
+    compact: 'Compact',
   }[resume.template_identifier] || 'Classic Professional'
 
   return (

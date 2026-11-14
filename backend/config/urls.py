@@ -30,6 +30,7 @@ urlpatterns = [
     path("api/health/", health_check, name="health-check"),
     path("admin/", admin.site.urls),
     path("api/", include("resumes.urls")),
+    path("api/account/", include("accounts.urls")),
     path("api/analyzer/", include("analyzer.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),

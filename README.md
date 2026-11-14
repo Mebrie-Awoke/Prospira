@@ -1,18 +1,18 @@
 # Prospira
 
-**Create better resumes. Present your experience with confidence.**
+**Build a stronger resume. Present your potential. Move your career forward.**
 
-Prospira is a full-stack resume builder that helps users create and manage resumes, choose professional templates, and get AI-assisted feedback tailored to a job description.
+Prospira is a full-stack resume platform with a public landing page, authenticated career workspace, professional resume templates, and AI-assisted feedback tailored to a job description.
 
 ## Features
 
 - Create, edit, and manage personal resumes.
 - Organize education, experience, skills, projects, certifications, and links.
-- Choose from four resume templates.
+- Choose from eight distinct resume template layouts, including classic, modern, minimalist, executive, technical, academic, creative, and compact.
 - Upload a profile photo.
 - Analyze resume content with AI and receive actionable feedback.
 - Compare resume skills with a target job description.
-- Secure account access with JWT authentication.
+- Secure account access with JWT authentication.\n- Update account profile details and change passwords.
 
 ## Tech Stack
 
@@ -40,7 +40,7 @@ Prospira/
 └── README.md
 ```
 
-## Run Locally
+## Frontend deployment configuration\n\nThe React application is deployed independently from the Django API. Set `VITE_API_BASE_URL` to the complete API base URL, including `/api`, in the frontend hosting environment. For Vercel, use the URL of your deployed Render API, for example `https://your-api.onrender.com/api`. The `frontend/vercel.json` file provides a single-page-app route fallback for React Router.\n\nFor local development, copy `frontend/.env.example` to `frontend/.env` and keep the local Django API URL.\n\n## Run Locally
 
 ### Requirements
 
@@ -118,7 +118,7 @@ Open the local URL printed by Vite (usually `http://localhost:5173`).
 | GET, POST | `/api/resumes/` | List or create resumes |
 | GET, PUT, PATCH, DELETE | `/api/resumes/{id}/` | Manage a resume |
 | POST, DELETE | `/api/resumes/{id}/photo/` | Add or remove a profile photo |
-| POST | `/api/analyzer/analyze/` | Analyze resume text |
+| POST | `/api/analyzer/analyze/` | Analyze resume text |\n| GET, PATCH | `/api/account/profile/` | Read or update the signed-in user's profile |\n| POST | `/api/account/password/` | Change the signed-in user's password |
 
 The analyzer accepts `resume_text` and an optional `job_description`. It returns a score, strengths, improvement suggestions, skills analysis, and recommendations. Authentication is required; requests are limited to 10 per user per hour.
 

@@ -1,9 +1,8 @@
 import axios from 'axios'
 
-// Production API hosted on Render.
-const apiBaseUrl = import.meta.env.DEV
-  ? 'http://127.0.0.1:8000/api'
-  : 'https://prospira-dis6.onrender.com/api'
+// Set VITE_API_BASE_URL in each deployment environment. Local development
+// falls back to the Django development server.
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api').replace(/\/$/, '')
 
 export const api = axios.create({
   baseURL: apiBaseUrl,

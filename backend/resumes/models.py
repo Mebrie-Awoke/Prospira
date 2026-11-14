@@ -9,6 +9,10 @@ class Resume(models.Model):
         ("modern-blue", "Modern Blue"),
         ("minimalist", "Minimalist"),
         ("executive", "Executive"),
+        ("technical", "Technical"),
+        ("academic", "Academic"),
+        ("creative", "Creative"),
+        ("compact", "Compact"),
     )
 
     user = models.ForeignKey(
