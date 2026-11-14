@@ -31,6 +31,9 @@ export function getApiError(error) {
   }
 
   const { status, data } = error.response
+
+  // Never expose framework tracebacks or internal server messages to end users.
+
   const messages = flattenMessages(data)
   if (messages.length) return messages.slice(0, 4).join(' ')
 
