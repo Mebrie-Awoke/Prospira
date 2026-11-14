@@ -4,6 +4,7 @@ import AppShell from './components/layout/AppShell'
 import AuthPage from './pages/AuthPage'
 import Analyzer from './pages/Analyzer'
 import AnalysisHistory from './pages/AnalysisHistory'
+import CoverLetterGenerator from './pages/CoverLetterGenerator'
 import Dashboard from './pages/Dashboard'
 import LandingPage from './pages/LandingPage'
 import ProfilePage from './pages/ProfilePage'
@@ -33,6 +34,7 @@ function AppRoutes() {
         <Route path="/templates" element={<Templates />} />
         <Route path="/analyzer" element={<Analyzer />} />
         <Route path="/analysis-history" element={<AnalysisHistory />} />
+        <Route path="/cover-letter" element={<CoverLetterGenerator />} />
         <Route path="/resumes/new" element={<ResumeBuilder />} />
         <Route path="/resumes/:id" element={<ResumeDetail />} />
         <Route path="/resumes/:id/edit" element={<ResumeBuilder />} />
