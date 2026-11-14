@@ -21,6 +21,9 @@ from reportlab.platypus import (
 from xml.sax.saxutils import escape
 
 
+UNICODE_FONT_AVAILABLE = False
+
+
 TEMPLATE_COLORS = {
     "classic": "#17365D",
     "modern-blue": "#155EEF",
@@ -34,6 +37,7 @@ TEMPLATE_COLORS = {
 
 
 def _register_fonts():
+    global UNICODE_FONT_AVAILABLE
     candidates = (
         ("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
         ("/usr/share/fonts/truetype/noto/NotoSansEthiopic-Regular.ttf", "/usr/share/fonts/truetype/noto/NotoSansEthiopic-Bold.ttf"),
@@ -44,6 +48,7 @@ def _register_fonts():
                 if "ProspiraSans" not in pdfmetrics.getRegisteredFontNames():
                     pdfmetrics.registerFont(TTFont("ProspiraSans", regular))
                     pdfmetrics.registerFont(TTFont("ProspiraSans-Bold", bold))
+                UNICODE_FONT_AVAILABLE = True
                 return "ProspiraSans", "ProspiraSans-Bold"
             except (OSError, ValueError):
                 continue
