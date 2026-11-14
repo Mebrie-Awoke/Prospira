@@ -34,7 +34,7 @@ describe('Analyzer', () => {
 
     expect(screen.getByRole('heading', { name: 'Resume Analyzer' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /Analyze resume/ }).disabled).toBe(true)
-    expect(screen.getByText('Add your resume text to start the analysis.')).toBeTruthy()
+    expect(screen.getByText('Upload a resume or paste its text to start the analysis.')).toBeTruthy()
   })
 
   it('rejects resume text above the character limit', () => {
@@ -75,7 +75,7 @@ describe('Analyzer', () => {
 
     expect(analyzerApi.analyze).toHaveBeenCalledTimes(1)
     expect(screen.getByRole('button', { name: /Analyzing resume/ }).disabled).toBe(true)
-    expect(screen.getByText('Your submitted text is being analyzed. This may take up to a minute.')).toBeTruthy()
+    expect(screen.getByText('Your submitted resume is being extracted and analyzed. This may take up to a minute.')).toBeTruthy()
   })
 
   it('shows backend field validation errors', async () => {
