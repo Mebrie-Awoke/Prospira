@@ -10,7 +10,6 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { analyzerApi } from '../api/analyzer'
 import { getApiError } from '../utils/apiErrors'
 
@@ -288,7 +287,7 @@ export default function Analyzer() {
               Cancel analysis
             </button>
           )}
-          <p className="analyzer-submit-note">Files are limited to 5 MB and 10 PDF pages. Scanned/image-only PDFs are not supported yet. <Link to="/analysis-history">View saved analyses</Link>.</p>
+          <p className="analyzer-submit-note">Files are limited to 5 MB and 10 PDF pages. Scanned/image-only PDFs are not supported yet. <a href="/analysis-history">View saved analyses</a>.</p>
         </form>
 
         <aside className="analyzer-results" aria-label="Analysis results" aria-live="polite">
