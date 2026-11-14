@@ -1,5 +1,6 @@
 
 from django.core.files.storage import default_storage
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, serializers, status
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -75,7 +76,7 @@ class ResumePDFAPIView(APIView):
         from .pdf import build_resume_pdf
 
         pdf_content, filename = build_resume_pdf(resume)
-        response = Response(pdf_content, content_type="application/pdf")
+        response = HttpResponse(pdf_content, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         response["Content-Length"] = str(len(pdf_content))
         response["Cache-Control"] = "private, no-store"
