@@ -109,3 +109,35 @@ class ChapaCallbackTests(TestCase):
         self.client.get(callback, {"trx_ref": self.transaction.tx_ref})
         self.assertEqual(Subscription.objects.get(user=self.user).current_period_end, end_date)
         verify_mock.assert_called_once()
+
+
+    @patch("billing.services.httpx.post")
+    @patch.dict(os.environ, {
+        "CHAPA_SECRET_KEY": "CHASECK_TEST-example",
+        "CHAPA_PREMIUM_AMOUNT_ETB": "299.00",
+        "SITE_URL": "https://prospira-api.onrender.com",
+        "FRONTEND_URL": "https://prospira.vercel.app",
+    })
+    def test_checkout_initializes_chapa_and_records_pending_transaction(self, post_mock):
+        response_from_provider = post_mock.return_value
+        response_from_provider.raise_for_status.return_value = None
+        response_from_provider.json.return_value = {
+            "status": "success",
+            "data": {"checkout_url": "https://checkout.chapa.co/example"},
+        }
+
+        response = self.client.post(
+            reverse("premium-checkout"),
+            {"first_name": "Mebrie", "last_name": "Awoke", "email": "mebrie@example.com"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["checkout_url"], "https://checkout.chapa.co/example")
+        transaction = PaymentTransaction.objects.get(user=self.user)
+        self.assertEqual(transaction.amount, Decimal("299.00"))
+        self.assertEqual(transaction.status, PaymentTransaction.Status.PENDING)
+        payload = post_mock.call_args.kwargs["json"]
+        self.assertEqual(payload["currency"], "ETB")
+        self.assertEqual(payload["callback_url"], "https://prospira-api.onrender.com/api/billing/chapa/callback/")
+        self.assertEqual(post_mock.call_args.kwargs["headers"]["Authorization"], "Bearer CHASECK_TEST-example")
