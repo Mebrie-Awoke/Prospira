@@ -446,3 +446,73 @@ class ResumeAnalysisHistoryTests(APITestCase):
             reverse("analysis-history-detail", args=[self.analysis.pk])
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class CoverLetterEndpointTests(APITestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="cover-letter-owner",
+            password="test-password",
+        )
+        self.other_user = get_user_model().objects.create_user(
+            username="cover-letter-other",
+            password="test-password",
+        )
+        self.client.force_authenticate(self.user)
+
+    @patch("analyzer.views.generate_cover_letter")
+    def test_generates_and_saves_letter_without_saving_source_inputs(self, generate_mock):
+        from analyzer.models import CoverLetter
+
+        generate_mock.return_value = "Dear Hiring Manager,\n\n" + ("Relevant experience. " * 12) + "\nSincerely,\nMebrie Awoke"
+        response = self.client.post(
+            reverse("cover-letter-generate"),
+            {
+                "resume_text": "Mebrie Awoke\nPython developer",
+                "job_description": "Seeking a Python developer",
+                "tone": "professional",
+                "title": "Mebrie Awoke — Python Developer",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["title"], "Mebrie Awoke — Python Developer")
+        saved = CoverLetter.objects.get(pk=response.data["id"])
+        self.assertEqual(saved.user, self.user)
+        self.assertNotIn("Python developer", saved.content.replace("Python developer", "", 1))
+        generate_mock.assert_called_once()
+
+    def test_cover_letter_library_is_private_and_owner_can_delete(self):
+        from analyzer.models import CoverLetter
+
+        letter = CoverLetter.objects.create(
+            user=self.user,
+            title="My application",
+            content="A complete cover letter body.",
+        )
+        CoverLetter.objects.create(
+            user=self.other_user,
+            title="Private letter",
+            content="Another user's private draft.",
+        )
+        listing = self.client.get(reverse("cover-letter-list"))
+        self.assertEqual(listing.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(listing.data), 1)
+
+        deleted = self.client.delete(
+            reverse("cover-letter-detail", args=[letter.pk])
+        )
+        self.assertEqual(deleted.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_cannot_access_another_users_cover_letter(self):
+        from analyzer.models import CoverLetter
+
+        letter = CoverLetter.objects.create(
+            user=self.other_user,
+            title="Private letter",
+            content="Private content.",
+        )
+        response = self.client.get(
+            reverse("cover-letter-detail", args=[letter.pk])
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
