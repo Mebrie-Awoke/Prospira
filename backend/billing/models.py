@@ -15,7 +15,7 @@ class Subscription(models.Model):
 
     def is_premium_active(self):
         from django.utils import timezone
-        return self.plan == self.Plan.PREMIUM and self.current_period_end and self.current_period_end > timezone.now()
+        return bool(self.plan == self.Plan.PREMIUM and self.current_period_end and self.current_period_end > timezone.now())
 
 
 class PaymentTransaction(models.Model):
