@@ -1,16 +1,15 @@
-name: Frontend build
+name: Frontend checks
 
 on:
   push:
     branches:
       - main
-      - feature/prospira-public-experience
   pull_request:
     branches:
       - main
 
 jobs:
-  build:
+  frontend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,5 +25,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
+      - name: Run frontend tests
+        run: npm test
       - name: Build production frontend
         run: npm run build
