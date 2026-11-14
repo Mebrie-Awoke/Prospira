@@ -5,8 +5,9 @@ import AuthPage from './pages/AuthPage'
 import Analyzer from './pages/Analyzer'
 import Dashboard from './pages/Dashboard'
 import LandingPage from './pages/LandingPage'
+import ProfilePage from './pages/ProfilePage'
+import SettingsPage from './pages/SettingsPage'
 import MyResumes from './pages/MyResumes'
-import PlaceholderPage from './pages/PlaceholderPage'
 import ResumeDetail from './pages/ResumeDetail'
 import ResumeBuilder from './pages/ResumeBuilder'
 import Templates from './pages/Templates'
@@ -33,8 +34,8 @@ function AppRoutes() {
         <Route path="/resumes/new" element={<ResumeBuilder />} />
         <Route path="/resumes/:id" element={<ResumeDetail />} />
         <Route path="/resumes/:id/edit" element={<ResumeBuilder />} />
-        <Route path="/profile" element={<PlaceholderPage type="profile" />} />
-        <Route path="/settings" element={<PlaceholderPage type="settings" />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
