@@ -12,4 +12,11 @@ export const analyzerApi = {
     const { data } = await api.post('/analyzer/analyze/', payload, { signal })
     return data
   },
+  async getHistory() {
+    const { data } = await api.get('/analyzer/history/')
+    return data
+  },
+  async deleteHistory(id) {
+    await api.delete(`/analyzer/history/${id}/`)
+  },
 }
