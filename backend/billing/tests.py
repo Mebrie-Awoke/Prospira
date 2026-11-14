@@ -134,7 +134,7 @@ class ChapaCallbackTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["checkout_url"], "https://checkout.chapa.co/example")
-        transaction = PaymentTransaction.objects.get(user=self.user)
+        transaction = PaymentTransaction.objects.exclude(pk=self.transaction.pk).get(user=self.user)
         self.assertEqual(transaction.amount, Decimal("299.00"))
         self.assertEqual(transaction.status, PaymentTransaction.Status.PENDING)
         payload = post_mock.call_args.kwargs["json"]
