@@ -51,6 +51,7 @@ function AppRoutes() {
   )
 }
 
+// Keep the application-wide error boundary active across every route.
 export default function App() {
   return <ErrorBoundary><BrowserRouter><AuthProvider><AppRoutes /></AuthProvider></BrowserRouter></ErrorBoundary>
 }
