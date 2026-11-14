@@ -141,6 +141,33 @@ Open the local URL printed by Vite (usually `http://localhost:5173`).
 
 The analyzer accepts `resume_text` and an optional `job_description`. It returns a score, strengths, improvement suggestions, skills analysis, and recommendations. Successful feedback is saved to the authenticated user's private history; source resume text, uploaded files, and job descriptions are not stored. Cover letter generation requires resume text and a target job description and stores only the generated letter. Analyzer and cover-letter generation are authenticated and share a rate limit of 10 AI requests per user per hour.
 
+
+## Production deployment
+
+### Render backend and PostgreSQL
+
+The repository includes a `render.yaml` Blueprint for a Docker web service, managed PostgreSQL, and a persistent media disk.
+
+1. Push the repository to GitHub and open the Render Dashboard.
+2. Choose **New → Blueprint**, connect this repository, and let Render read `render.yaml`.
+3. Review the paid web-service, database, and disk plans shown by Render before confirming. The Blueprint uses Frankfurt for the web service and database.
+4. When prompted, set `CORS_ALLOWED_ORIGINS` to the exact HTTPS origin of the deployed Vercel frontend (for example, `https://your-project.vercel.app`). Do not include a trailing slash.
+5. Set `GROQ_API_KEY` using the secret from your Groq account. Keep it in Render's environment settings only.
+6. Wait for the first deployment and check `https://YOUR-RENDER-SERVICE.onrender.com/api/health/`.
+
+The container runs database migrations before starting Gunicorn. The persistent disk is mounted at `backend/media` so profile photos survive deployments. Keep database backups enabled and do not remove the disk without migrating uploaded files first.
+
+### Vercel frontend
+
+1. Import this repository into Vercel.
+2. Set the project **Root Directory** to `frontend`.
+3. Use `npm run build` as the build command and `dist` as the output directory.
+4. Add `VITE_API_BASE_URL=https://YOUR-RENDER-SERVICE.onrender.com/api` to the Vercel production environment.
+5. Redeploy after setting the environment variable.
+6. Copy the final Vercel origin into Render's `CORS_ALLOWED_ORIGINS` setting and redeploy the backend if it changes.
+
+Use HTTPS for both services. Configure a custom domain only after the default deployment passes health checks and the login, resume upload, PDF export, AI analysis, history, and cover-letter flows have been tested end to end.
+
 ## Docker
 
 Build and run from the repository root:
